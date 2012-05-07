@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<instruction xmlns="http://objectrepository.org/instruction/1.0/" access="open" contentType="image/jpg" na="12345"
+    lidPrefix="HU:OSA:380:" resolverBaseUrl="http://hdl.handle.net/" label="My alias for a folder"
+    fileSet="./instruction-manager/src/test/resources/test-collection/">
+    <stagingfile>
+        <task>
+            <name>ingestmasters</name>
+            <statusCode>40</statusCode>
+        </task>
+        <contentType>image/jpeg</contentType>
+        <pid>10891/HU:OSA:380:12345</pid>
+        <lid>1234503</lid>
+        <location>File on the staging area...</location>
+        <md5>dc2227bf78e0ee19f8929530cdedc5e7</md5>
+        <access>open</access>
+    </stagingfile>
+</instruction>
