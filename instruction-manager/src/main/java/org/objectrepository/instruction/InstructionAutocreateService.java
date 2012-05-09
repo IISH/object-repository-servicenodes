@@ -15,13 +15,13 @@
  */
 package org.objectrepository.instruction;
 
+import org.apache.commons.io.FilenameUtils;
 import org.objectrepository.exceptions.InstructionException;
 import org.objectrepository.instruction.dao.OrIterator;
 import org.objectrepository.pid.PidHttpClient;
 import org.objectrepository.util.Checksum;
 import org.objectrepository.util.Normalizers;
 import org.objectrepository.util.PidGenerator;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -78,8 +78,8 @@ public final class InstructionAutocreateService extends ServiceBaseImp {
      * <p/>
      * The logic will only apply to empty pid fields
      *
-     * @param iterator
-     * @param stagingfileType
+     * @param iterator The container of stagingfiles references
+     * @param stagingfileType the stagingfile
      */
     public void addPid(OrIterator iterator, StagingfileType stagingfileType) {
         final String autoGeneratePIDs = iterator.getInstruction().getAutoGeneratePIDs();
@@ -114,9 +114,9 @@ public final class InstructionAutocreateService extends ServiceBaseImp {
      * See if we need to bind a lid with a pid.
      * We will create a PID here if there is none.
      *
-     * @param instructionType
-     * @param lid
-     * @return pid
+     * @param instructionType The container of the stagingfiles
+     * @param lid Local identifier
+     * @return pid Peristant identifier from webservice
      */
     private String getPid(InstructionType instructionType, String lid) {
         String cp_url = (instructionType.getPidwebserviceEndpoint() == null) ? null : instructionType.getPidwebserviceEndpoint();
