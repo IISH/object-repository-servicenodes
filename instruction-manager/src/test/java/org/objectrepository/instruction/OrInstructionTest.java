@@ -313,6 +313,7 @@ public class OrInstructionTest {
     @Test
     public void testInstructionUpload() throws Exception {
 
+
         // Create an instruction
         dao.delete(fileSet);
         InstructionType instructionType = objectFactory.createInstructionType();
@@ -351,7 +352,7 @@ public class OrInstructionTest {
 
         // Add some poison
         orFsIterator.getInstruction().getStagingfile().get(1).setLid(null);
-        orFsIterator.getInstruction().getStagingfile().get(2).setMd5("This ought to cause a MD5Mismatch");
+        orFsIterator.getInstruction().getStagingfile().get(2).setMd5("00000000000000000000000000000000");
         orFsIterator.getInstruction().getStagingfile().get(3).setMd5(null);
         StagingfileType undeclared = new StagingfileType();
         undeclared.setLid(PidGenerator.getPid());
@@ -373,9 +374,10 @@ public class OrInstructionTest {
         // Results
         iterator = dao.load(na, fileSet);
         Map statusCodes = Utils.statusCodes(iterator);
+        Assert.assertEquals(7, statusCodes.size());
         Assert.assertEquals(1, statusCodes.get(InstructionException.FileDoesNotExist));
         Assert.assertEquals(1, statusCodes.get(InstructionException.MD5Missing));
-        //Assert.assertEquals(1, statusCodes.get(InstructionException.MD5Mismatch));
+        Assert.assertEquals(1, statusCodes.get(InstructionException.MD5Mismatch));
         Assert.assertEquals(2, statusCodes.get(InstructionException.FileZeroSize));
         Assert.assertEquals(1, statusCodes.get(InstructionException.MissingFileSection));
         final StagingfileType stagingfileByLocation = iterator.getFileByLocation(fileWithPid);
