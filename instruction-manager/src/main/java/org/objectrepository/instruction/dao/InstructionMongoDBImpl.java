@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -221,9 +222,9 @@ public class InstructionMongoDBImpl implements InstructionDao {
 
     @Override
     public void removetasks(InstructionType instruction) {
-        final DBObject query = new BasicDBObject("task.statusCode", 702);
-        query.put("fileSet", Normalizers.normalize(instruction.getFileSet()));
-        mongoTemplate.getCollection(stagingfile).remove(query, WriteConcern.FSYNC_SAFE);
+        final DBObject query = new BasicDBObject("fileSet", Normalizers.normalize(instruction.getFileSet()));
+        final Update update = new Update().unset("task");
+        mongoTemplate.getCollection(stagingfile).updateMulti(query, update.getUpdateObject());
     }
 
     private String getCollectionName(String na, String fileSet) {

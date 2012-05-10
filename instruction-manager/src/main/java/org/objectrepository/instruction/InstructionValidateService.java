@@ -46,6 +46,9 @@ public final class InstructionValidateService extends ServiceBaseImp {
     @Autowired
     OrDaoImp orDaoImp;
 
+    @Autowired
+    private InstructionAutocreateService autocreateService;
+
     @Override
     public void build(OrIterator instruction) {
         super.build(instruction);
@@ -126,6 +129,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
      *                    <li>if no NA value is provided in the header, AND no pid values provided for the stagingfile (errorCode MissingNAValue)
      * @param instruction - that contains the section on fileTypes
      * @throws org.objectrepository.exceptions.InstructionException
+     *
      * @throws IOException
      * @throws NoSuchAlgorithmException
      * @see ServiceBaseImp
@@ -135,6 +139,11 @@ public final class InstructionValidateService extends ServiceBaseImp {
 
         StagingfileType stagingfileType = instruction.getFileByLocation(Normalizers.toRelative(instruction.getInstruction().getFileSet(), file));
         if (wrongFileContent(file, instruction, stagingfileType)) {
+            instruction.add(stagingfileType);
+        }
+
+        if (stagingfileType.getPid() == null) {
+            autocreateService.addPid(instruction, stagingfileType);
             instruction.add(stagingfileType);
         }
     }
@@ -155,7 +164,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
     private boolean wrongFileContent(File file, OrIterator instruction, StagingfileType stagingfileType) {
 
         if (stagingfileType == null) {
-            stagingfileType = setMissingSection(instruction.getInstruction().getFileSet(), file);
+            setMissingSection(instruction.getInstruction().getFileSet(), file);
             return true;
         }
 
@@ -164,11 +173,6 @@ public final class InstructionValidateService extends ServiceBaseImp {
             final String action = (String) InstructionTypeHelper.getValue(global, stagingfileType, "action");
             if (action == null) {
                 throw new InstructionException("ActionMissing");
-            }
-
-            final String autoGeneratePIDs = instruction.getInstruction().getAutoGeneratePIDs();
-            if (Normalizers.isEmpty(stagingfileType.getPid()) && (Normalizers.isEmpty(autoGeneratePIDs) || !autoGeneratePIDs.equals("lid"))) {
-                throw new InstructionException("PidMissing");
             }
 
             if (action.equalsIgnoreCase("delete")) return false;
@@ -195,7 +199,6 @@ public final class InstructionValidateService extends ServiceBaseImp {
 
                 fileTypeForFile(stagingfileType, file);
             }
-
         } catch (InstructionException se) {
             customInfo(stagingfileType, se);
             return true;
@@ -210,30 +213,22 @@ public final class InstructionValidateService extends ServiceBaseImp {
         return stagingfileType;
     }
 
-    private void fileTypeForFile(StagingfileType stagingfileType, File file) {
+    private void fileTypeForFile(StagingfileType stagingfileType, File file) throws InstructionException {
 
-        try {
-            if (!file.canRead())
-                throw new InstructionException("CantReadFile");
+        if (!file.canRead())
+            throw new InstructionException("CantReadFile");
 
-            if (file.length() == 0)
-                throw new InstructionException("FileZeroSize");
+        if (file.length() == 0)
+            throw new InstructionException("FileZeroSize");
 
-            final String md5_from_instruction = stagingfileType.getMd5();
-            if (md5_from_instruction == null)
-                throw new InstructionException("MD5Missing");
+        final String md5_from_instruction = stagingfileType.getMd5();
+        if (md5_from_instruction == null)
+            throw new InstructionException("MD5Missing");
 
-            final String md5_from_file = Checksum.getMD5(file);
-            final boolean identical = Checksum.compare(md5_from_file, md5_from_instruction);
-            if (!identical) {
-                throw new InstructionException("MD5Mismatch");
-            }
-
-        } catch (InstructionException se) {
-            customInfo(stagingfileType, se);
-        } catch (Exception e) { // In case something is wrong with the stagingfile's access
-            final TaskType cantReadFile = InstructionException.getTaskByStatus("CantReadFile");
-            customInfo(stagingfileType, cantReadFile);
+        final String md5_from_file = Checksum.getMD5(file);
+        final boolean identical = Checksum.compare(md5_from_file, md5_from_instruction);
+        if (!identical) {
+            throw new InstructionException("MD5Mismatch");
         }
     }
 

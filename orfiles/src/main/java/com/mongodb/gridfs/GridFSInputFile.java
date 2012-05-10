@@ -22,28 +22,32 @@ import java.util.Date;
  */
 public class GridFSInputFile extends GridFSFile {
 
-    private String md5;
+    /**
+     * setId
+     * <p/>
+     * The id was originally set in the main constructor using an new ObjectId() value
+     * Here we have added a custom id value purely to be able to have control over the value of the shard key.
+     *
+     * @param id
+     */
+    public void setId(String id) {
+        _id = id;
+    }
 
     /**
      * Default constructor setting the GridFS file name and providing an input
      * stream containing data to be written to the file.
      *
-     * @param fs
-     *            The GridFS connection handle.
-     * @param in
-     *            Stream used for reading data from.
-     * @param filename
-     *            Name of the file to be created.
-     * @param closeStreamOnPersist
-                  indicate the passed in input stream should be closed once the data chunk persisted
+     * @param fs                   The GridFS connection handle.
+     * @param in                   Stream used for reading data from.
+     * @param filename             Name of the file to be created.
+     * @param closeStreamOnPersist indicate the passed in input stream should be closed once the data chunk persisted
      */
     GridFSInputFile(GridFS fs, InputStream in, String filename, boolean closeStreamOnPersist) {
         _fs = fs;
         _in = in;
         _filename = filename;
         _closeStreamOnPersist = closeStreamOnPersist;
-
-        _id = null;
         _chunkSize = GridFS.DEFAULT_CHUNKSIZE;
         _uploadDate = new Date();
         _messageDigester = _md5Pool.get();
@@ -55,15 +59,12 @@ public class GridFSInputFile extends GridFSFile {
      * Default constructor setting the GridFS file name and providing an input
      * stream containing data to be written to the file.
      *
-     * @param fs
-     *            The GridFS connection handle.
-     * @param in
-     *            Stream used for reading data from.
-     * @param filename
-     *            Name of the file to be created.
+     * @param fs       The GridFS connection handle.
+     * @param in       Stream used for reading data from.
+     * @param filename Name of the file to be created.
      */
     GridFSInputFile(GridFS fs, InputStream in, String filename) {
-        this( fs, in, filename, false);
+        this(fs, in, filename, false);
     }
 
     /**
@@ -72,13 +73,11 @@ public class GridFSInputFile extends GridFSFile {
      * {@link java.io.OutputStream} can later be obtained for writing using the
      * {@link #getOutputStream()} method.
      *
-     * @param fs
-     *            The GridFS connection handle.
-     * @param filename
-     *            Name of the file to be created.
+     * @param fs       The GridFS connection handle.
+     * @param filename Name of the file to be created.
      */
     GridFSInputFile(GridFS fs, String filename) {
-        this( fs , null , filename );
+        this(fs, null, filename);
     }
 
     /**
@@ -86,35 +85,33 @@ public class GridFSInputFile extends GridFSFile {
      * {@link java.io.InputStream}. An {@link java.io.OutputStream} can later be
      * obtained for writing using the {@link #getOutputStream()} method.
      *
-     * @param fs
-     *            The GridFS connection handle.
+     * @param fs The GridFS connection handle.
      */
     GridFSInputFile(GridFS fs) {
-        this( fs , null , null );
+        this(fs, null, null);
     }
 
     /**
      * Sets the file name on the GridFS entry.
      *
-     * @param fn
-     *            File name.
+     * @param fn File name.
      */
-    public void setFilename( String fn ) {
+    public void setFilename(String fn) {
         _filename = fn;
     }
 
     /**
      * Sets the content type (MIME type) on the GridFS entry.
      *
-     * @param ct
-     *            Content type.
+     * @param ct Content type.
      */
-    public void setContentType( String ct ) {
+    public void setContentType(String ct) {
         _contentType = ct;
     }
 
     /**
      * Set the chunk size. This must be called before saving any data.
+     *
      * @param _chunkSize
      */
     public void setChunkSize(long _chunkSize) {
@@ -128,27 +125,26 @@ public class GridFSInputFile extends GridFSFile {
      */
     @Override
     public void save() {
-        save( _chunkSize);
+        save(_chunkSize);
     }
 
     /**
      * This method first calls saveChunks(long) if the file data has not been saved yet.
      * Then it persists the file entry to GridFS.
      *
-     * @param chunkSize
-     *            Size of chunks for file in bytes.
+     * @param chunkSize Size of chunks for file in bytes.
      */
-    public void save( long chunkSize ) {
+    public void save(long chunkSize) {
         if (_outputStream != null)
-            throw new MongoException( "cannot mix OutputStream and regular save()" );
+            throw new MongoException("cannot mix OutputStream and regular save()");
 
         // note that chunkSize only changes _chunkSize in case we actually save chunks
         // otherwise there is a risk file and chunks are not compatible
-        if ( ! _savedChunks ) {
+        if (!_savedChunks) {
             try {
-                saveChunks( chunkSize );
-            } catch ( IOException ioe ) {
-                throw new MongoException( "couldn't save chunks" , ioe );
+                saveChunks(chunkSize);
+            } catch (IOException ioe) {
+                throw new MongoException("couldn't save chunks", ioe);
             }
         }
 
@@ -156,15 +152,13 @@ public class GridFSInputFile extends GridFSFile {
     }
 
     /**
-     * @see GridFSInputFile#saveChunks(long)
-     *
      * @return Number of the next chunk.
-     * @throws IOException
-     *             on problems reading the new entry's
-     *             {@link java.io.InputStream}.
+     * @throws IOException on problems reading the new entry's
+     *                     {@link java.io.InputStream}.
+     * @see GridFSInputFile#saveChunks(long)
      */
     public int saveChunks() throws IOException {
-        return saveChunks( _chunkSize );
+        return saveChunks(_chunkSize);
     }
 
     /**
@@ -172,33 +166,31 @@ public class GridFSInputFile extends GridFSFile {
      * to GridFS. A non-default chunk size can be specified.
      * This method does NOT save the file object itself, one must call save() to do so.
      *
-     * @param chunkSize
-     *            Size of chunks for file in bytes.
+     * @param chunkSize Size of chunks for file in bytes.
      * @return Number of the next chunk.
-     * @throws IOException
-     *             on problems reading the new entry's
-     *             {@link java.io.InputStream}.
+     * @throws IOException on problems reading the new entry's
+     *                     {@link java.io.InputStream}.
      */
-    public int saveChunks( long chunkSize ) throws IOException {
+    public int saveChunks(long chunkSize) throws IOException {
         if (_outputStream != null)
-            throw new MongoException( "cannot mix OutputStream and regular save()" );
-        if ( _savedChunks )
-            throw new MongoException( "chunks already saved!" );
+            throw new MongoException("cannot mix OutputStream and regular save()");
+        if (_savedChunks)
+            throw new MongoException("chunks already saved!");
 
-        if ( _chunkSize != chunkSize ) {
+        if (_chunkSize != chunkSize) {
             _chunkSize = chunkSize;
             _buffer = new byte[(int) _chunkSize];
         }
 
-        if ( chunkSize > 3.5 * 1000 * 1000 ) {
-            throw new MongoException( "chunkSize must be less than 3.5MiB!" );
+        if (chunkSize > 3.5 * 1000 * 1000) {
+            throw new MongoException("chunkSize must be less than 3.5MiB!");
         }
 
         int bytesRead = 0;
-        while ( bytesRead >= 0 ) {
+        while (bytesRead >= 0) {
             _currentBufferPosition = 0;
             bytesRead = _readStream2Buffer();
-            _dumpBuffer( true );
+            _dumpBuffer(true);
         }
 
         // only finish data, do not write file, in case one wants to change metadata
@@ -216,7 +208,7 @@ public class GridFSInputFile extends GridFSFile {
      * @return Writable stream object.
      */
     public OutputStream getOutputStream() {
-        if ( _outputStream == null ) {
+        if (_outputStream == null) {
             _outputStream = new MyOutputStream();
         }
         return _outputStream;
@@ -225,13 +217,13 @@ public class GridFSInputFile extends GridFSFile {
     /**
      * Dumps a new chunk into the chunks collection. Depending on the flag, also
      * partial buffers (at the end) are going to be written immediately.
+     * <p/>
+     * Data for chunk.
      *
-     *            Data for chunk.
-     * @param writePartial
-     *            Write also partial buffers full.
+     * @param writePartial Write also partial buffers full.
      */
-    private void _dumpBuffer( boolean writePartial ) {
-        if ( ( _currentBufferPosition < _chunkSize ) && !writePartial ) {
+    private void _dumpBuffer(boolean writePartial) {
+        if ((_currentBufferPosition < _chunkSize) && !writePartial) {
             // Bail out, chunk not complete yet
             return;
         }
@@ -241,20 +233,19 @@ public class GridFSInputFile extends GridFSFile {
         }
 
         byte[] writeBuffer = _buffer;
-        if ( _currentBufferPosition != _chunkSize ) {
+        if (_currentBufferPosition != _chunkSize) {
             writeBuffer = new byte[_currentBufferPosition];
-            System.arraycopy( _buffer, 0, writeBuffer, 0, _currentBufferPosition );
+            System.arraycopy(_buffer, 0, writeBuffer, 0, _currentBufferPosition);
         }
 
         DBObject chunk = BasicDBObjectBuilder.start()
-                .add( "files_id", _id )
-                .add( "n", _currentChunkNumber )
-                .add( "data", writeBuffer )
-                .add( "md5", md5).get();
-        _fs._chunkCollection.save( chunk );
+                .add("files_id", _id)
+                .add("n", _currentChunkNumber)
+                .add("data", writeBuffer).get();
+        _fs._chunkCollection.save(chunk);
         _currentChunkNumber++;
         _totalBytes += writeBuffer.length;
-        _messageDigester.update( writeBuffer );
+        _messageDigester.update(writeBuffer);
         _currentBufferPosition = 0;
     }
 
@@ -262,18 +253,17 @@ public class GridFSInputFile extends GridFSFile {
      * Reads a buffer full from the {@link java.io.InputStream}.
      *
      * @return Number of bytes read from stream.
-     * @throws IOException
-     *             if the reading from the stream fails.
+     * @throws IOException if the reading from the stream fails.
      */
     private int _readStream2Buffer() throws IOException {
         int bytesRead = 0;
-        while ( _currentBufferPosition < _chunkSize && bytesRead >= 0 ) {
-            bytesRead = _in.read( _buffer, _currentBufferPosition,
-                                 (int) _chunkSize - _currentBufferPosition );
-            if ( bytesRead > 0 ) {
+        while (_currentBufferPosition < _chunkSize && bytesRead >= 0) {
+            bytesRead = _in.read(_buffer, _currentBufferPosition,
+                    (int) _chunkSize - _currentBufferPosition);
+            if (bytesRead > 0) {
                 _currentBufferPosition += bytesRead;
-            } else if ( bytesRead == 0 ) {
-                throw new RuntimeException( "i'm doing something wrong" );
+            } else if (bytesRead == 0) {
+                throw new RuntimeException("i'm doing something wrong");
             }
         }
         return bytesRead;
@@ -284,13 +274,13 @@ public class GridFSInputFile extends GridFSFile {
      */
     private void _finishData() {
         if (!_savedChunks) {
-            _md5 = Util.toHex( _messageDigester.digest() );
-            _md5Pool.done( _messageDigester );
+            _md5 = Util.toHex(_messageDigester.digest());
+            _md5Pool.done(_messageDigester);
             _messageDigester = null;
             _length = _totalBytes;
             _savedChunks = true;
             try {
-                if ( _in != null && _closeStreamOnPersist )
+                if (_in != null && _closeStreamOnPersist)
                     _in.close();
             } catch (IOException e) {
                 //ignore
@@ -312,7 +302,7 @@ public class GridFSInputFile extends GridFSFile {
      * A pool of {@link java.security.MessageDigest} objects.
      */
     static SimplePool<MessageDigest> _md5Pool
-            = new SimplePool<MessageDigest>( "md5" , 10 , -1 , false , false ) {
+            = new SimplePool<MessageDigest>("md5", 10, -1, false, false) {
         /**
          * {@inheritDoc}
          *
@@ -320,16 +310,12 @@ public class GridFSInputFile extends GridFSFile {
          */
         protected MessageDigest createNew() {
             try {
-                return MessageDigest.getInstance( "MD5" );
-            } catch ( java.security.NoSuchAlgorithmException e ) {
-                throw new RuntimeException( "your system doesn't have md5!" );
+                return MessageDigest.getInstance("MD5");
+            } catch (java.security.NoSuchAlgorithmException e) {
+                throw new RuntimeException("your system doesn't have md5!");
             }
         }
     };
-
-    public void setId(String id) {
-        _id = id;
-    }
 
     /**
      * An output stream implementation that can be used to successively write to
@@ -345,10 +331,10 @@ public class GridFSInputFile extends GridFSFile {
          * @see java.io.OutputStream#write(int)
          */
         @Override
-        public void write( int b ) throws IOException {
+        public void write(int b) throws IOException {
             byte[] byteArray = new byte[1];
             byteArray[0] = (byte) (b & 0xff);
-            write( byteArray, 0, 1 );
+            write(byteArray, 0, 1);
         }
 
         /**
@@ -357,21 +343,21 @@ public class GridFSInputFile extends GridFSFile {
          * @see java.io.OutputStream#write(byte[], int, int)
          */
         @Override
-        public void write( byte[] b , int off , int len ) throws IOException {
+        public void write(byte[] b, int off, int len) throws IOException {
             int offset = off;
             int length = len;
             int toCopy = 0;
-            while ( length > 0 ) {
+            while (length > 0) {
                 toCopy = length;
-                if ( toCopy > _chunkSize - _currentBufferPosition ) {
+                if (toCopy > _chunkSize - _currentBufferPosition) {
                     toCopy = (int) _chunkSize - _currentBufferPosition;
                 }
-                System.arraycopy( b, offset, _buffer, _currentBufferPosition, toCopy );
+                System.arraycopy(b, offset, _buffer, _currentBufferPosition, toCopy);
                 _currentBufferPosition += toCopy;
                 offset += toCopy;
                 length -= toCopy;
-                if ( _currentBufferPosition == _chunkSize ) {
-                    _dumpBuffer( false );
+                if (_currentBufferPosition == _chunkSize) {
+                    _dumpBuffer(false);
                 }
             }
         }
@@ -384,7 +370,7 @@ public class GridFSInputFile extends GridFSFile {
         @Override
         public void close() {
             // write last buffer if needed
-            _dumpBuffer( true );
+            _dumpBuffer(true);
             // finish stream
             _finishData();
             // save file obj
