@@ -45,3 +45,6 @@ Thumbs.db
 # Developer files #
 *.bat
 *.lnk
+
+# Test material
+*.md5
