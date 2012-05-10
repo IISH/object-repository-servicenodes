@@ -107,12 +107,15 @@ public class OrInstructionTest {
             System.setProperty("or.properties", file.getAbsolutePath());
         }
 
+        new File(fileSet, "instruction.xml").delete();
+
         removeSneak();
     }
 
     @AfterClass
     public static void tearDown() {
         removeSneak();
+        new File(fileSet, "instruction.xml").delete();
     }
 
     /**
