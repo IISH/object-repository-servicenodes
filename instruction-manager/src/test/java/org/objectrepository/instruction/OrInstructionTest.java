@@ -373,7 +373,6 @@ public class OrInstructionTest {
         // Results
         iterator = dao.load(na, fileSet);
         Map statusCodes = Utils.statusCodes(iterator);
-        Assert.assertEquals(11, statusCodes.get(0));
         Assert.assertEquals(1, statusCodes.get(InstructionException.FileDoesNotExist));
         Assert.assertEquals(1, statusCodes.get(InstructionException.MD5Missing));
         Assert.assertEquals(1, statusCodes.get(InstructionException.MD5Mismatch));
