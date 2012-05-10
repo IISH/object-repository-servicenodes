@@ -43,7 +43,7 @@
 
     <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
         <property name="contextPaths" value="org.objectrepository.instruction"/>
-        <!--<property name="schema" value="classpath:instruction.v1.0.xsd"/>-->
+        <!--<property name="schema" value="classpath:instruction.xsd"/>-->
     </bean>
 
     <bean class="org.objectrepository.pid.PidHttpClient">

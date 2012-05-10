@@ -20,9 +20,6 @@
         targetNamespace="http://objectrepository.org/instruction/1.0/"
         xmlns:tns="http://objectrepository.org/instruction/1.0/">
 
-    <xs:include schemaLocation="task.xsd"/>
-    <xs:include schemaLocation="stagingfile.xsd"/>
-
     <xs:element name="instruction" type="tns:InstructionType">
         <xs:annotation>
             <xs:documentation xml:lang="en">The document main element. It contains global attributes that apply to the
@@ -33,21 +30,8 @@
 
     <xs:complexType name="InstructionType">
         <xs:sequence>
-            <xs:element name="task" type="tns:taskType" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation xml:lang="en">task (system): includes workflow step, info, error code
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element ref="tns:stagingfile" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="stagingfile" type="tns:stagingfileType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
-        <xs:attribute name="fileSet">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">fileSet (system): The root folder containing all sub folder and
-                    stagingfiles.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
         <xs:attribute name="label">
             <xs:annotation>
                 <xs:documentation xml:lang="en">label : An alias for the root folder's name.
@@ -76,14 +60,6 @@
             <xs:annotation>
                 <xs:documentation xml:lang="en">resolverBaseUrl : The base URL of the resolver. At the OR jump
                     off page this is prefixed to the PID.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="na">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">na (system): The naming authority of the CP. Required when
-                    using the HOPE PID
-                    webservice.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -123,17 +99,65 @@
                 <xs:documentation xml:lang="en">pidwebserviceKey : pid webservice key (36 size UUID)</xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="version" type="xs:long" default="0">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">version (system): optimistic locking
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" name="id">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">id (system): local identifier</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="stagingfileType">
+        <xs:all>
+            <xs:element name="action" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">action : See the access element description.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="add"/>
+                        <xs:enumeration value="update"/>
+                        <xs:enumeration value="upsert"/>
+                        <xs:enumeration value="delete"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element type="xs:string" name="pid" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">pid : the persistent identifier without the resolver
+                        server Url.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="lid" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">lid : the local identifier of the stagingfile.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="location" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">location : The stagingfile's name; or the absolute path and
+                        stagingfile's name.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="md5" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">md5 : MD5 checksum of the stagingfile specified in the location
+                        element. Left trailing zero's may be skipped.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="contentType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">contentType : The content type of the filestream.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="access" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">access : Indicates if the resource is available
+                        to the public.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
     </xs:complexType>
 
 </xs:schema>
