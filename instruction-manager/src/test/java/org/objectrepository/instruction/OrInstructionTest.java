@@ -17,11 +17,8 @@
 
 package org.objectrepository.instruction;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-import org.bson.types.ObjectId;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -39,7 +36,6 @@ import org.objectrepository.util.TestHelperMethods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -144,7 +140,7 @@ public class OrInstructionTest {
         instructionManager.InstructionAutocreate(instructionType);
 
         // Now test filecount
-        final OrIterator iterator = dao.load(na, fileSet);
+        final OrIterator iterator = dao.load(instructionType);
         Assert.assertEquals(16, iterator.count());
 
         // We should have two errors, so two tasks
@@ -181,7 +177,7 @@ public class OrInstructionTest {
         instructionManager.InstructionAutocreate(instructionType);
         instructionManager.InstructionValidate(instructionType);
 
-        final OrIterator iterator = dao.load(na, fileSet);
+        final OrIterator iterator = dao.load(instructionType);
         Map statusCodes = Utils.statusCodes(iterator);
         Assert.assertEquals("Ought to have two tasks because files are zero in length", 2, statusCodes.get(InstructionException.FileZeroSize));
         Assert.assertEquals("14 documents ought to be fine", 14, statusCodes.get(0));
@@ -218,12 +214,11 @@ public class OrInstructionTest {
         instructionManager.InstructionAutocreate(instructionType);
 
         // Re-write the instruction to the fs
-        final DBObject query = new BasicDBObject("_id", new ObjectId(instructionType.getId()));
-        final DBObject update = Update.update("autoGeneratePIDs", "filename2lid").getUpdateObject();
-        mongoTemplate.getCollection("instruction").update(query, update, false, false);
+
+        instructionType.setAutoGeneratePIDs("filename2lid");
         instructionManager.InstructionValidate(instructionType);
 
-        final OrIterator iterator = dao.load(na, fileSet);
+        final OrIterator iterator = dao.load(instructionType);
         Map statusCodes = Utils.statusCodes(iterator);
         Assert.assertEquals("Ought to have two tasks because files are zero in length", 2, statusCodes.get(InstructionException.FileZeroSize));
         Assert.assertEquals("14 documents ought to be fine", 14, statusCodes.get(0));
@@ -258,7 +253,7 @@ public class OrInstructionTest {
         instructionManager.InstructionAutocreate(instructionType);
 
         // Now test filecount
-        final OrIterator iterator = dao.load(na, fileSet);
+        final OrIterator iterator = dao.load(instructionType);
 
         Assert.assertEquals(16, iterator.count());
         Map statusCodes = Utils.statusCodes(iterator);
@@ -293,12 +288,13 @@ public class OrInstructionTest {
 
         instructionManager.InstructionAutocreate(instructionType);
         instructionManager.InstructionValidate(instructionType);
-        final OrIterator iterator = dao.load(na, fileSet);
+        final OrIterator iterator = dao.load(instructionType);
 
         // We should have PID errors
         Map statusCodes = Utils.statusCodes(iterator);
         Assert.assertNull(statusCodes.get(0));
-        Assert.assertEquals(16, statusCodes.get(InstructionException.PidMissing));
+        Assert.assertEquals(2, statusCodes.get(InstructionException.FileZeroSize));
+        Assert.assertEquals(14, statusCodes.get(InstructionException.PidMissing));
     }
 
     /**
@@ -332,7 +328,7 @@ public class OrInstructionTest {
         instructionType.setTask(taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
-        OrIterator iterator = dao.load(na, fileSet); // get documents from database
+        OrIterator iterator = dao.load(instructionType); // get documents from database
 
         // Write the instruction to the fs
         InstructionFilesystemImpl doaFilesystem = new InstructionFilesystemImpl();
@@ -372,16 +368,12 @@ public class OrInstructionTest {
         removeSneak();
 
         // Results
-        iterator = dao.load(na, fileSet);
+        iterator = dao.load(iterator.getInstruction());
         Map statusCodes = Utils.statusCodes(iterator);
-        // For some reason this is 6 or 7...
-        final int size = statusCodes.size();
-        Assert.assertTrue(size == 6 || size == 7);
+        Assert.assertEquals(18, iterator.count());
         Assert.assertEquals(1, statusCodes.get(InstructionException.FileDoesNotExist));
         Assert.assertEquals(1, statusCodes.get(InstructionException.MD5Missing));
-        if (size == 7) {
-            Assert.assertEquals(1, statusCodes.get(InstructionException.MD5Mismatch));
-        }
+        Assert.assertEquals(1, statusCodes.get(InstructionException.MD5Mismatch));
         Assert.assertEquals(2, statusCodes.get(InstructionException.FileZeroSize));
         Assert.assertEquals(1, statusCodes.get(InstructionException.MissingFileSection));
         final StagingfileType stagingfileByLocation = iterator.getFileByLocation(fileWithPid);
@@ -410,7 +402,7 @@ public class OrInstructionTest {
         instructionType.setTask(taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
-        final OrIterator iterator = dao.load(na, fileSet); // get documents from database
+        final OrIterator iterator = dao.load(instructionType); // get documents from database
         boolean ok = true;
         while (iterator.hasNext()) {
             final StagingfileType stagingfileType = iterator.next();
@@ -445,7 +437,7 @@ public class OrInstructionTest {
         instructionType.setTask(taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
-        final OrIterator iterator = dao.load(na, fileSet); // get documents from database
+        final OrIterator iterator = dao.load(instructionType); // get documents from database
         boolean ok = true;
         while (iterator.hasNext()) {
             final StagingfileType stagingfileType = iterator.next();
@@ -476,7 +468,7 @@ public class OrInstructionTest {
         instructionType.setTask(taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
-        OrIterator iterator = dao.load(na, fileSet);
+        OrIterator iterator = dao.load(instructionType);
 
         InstructionFilesystemImpl doaFilesystem = new InstructionFilesystemImpl();
         doaFilesystem.setMarshaller(marshaller);
@@ -491,7 +483,7 @@ public class OrInstructionTest {
         doaFilesystem.persist(orFsIterator);
 
         instructionManager.InstructionUpload(iterator.getInstruction());
-        iterator = dao.load(na, fileSet); // get documents from database
+        iterator = dao.load(iterator.getInstruction()); // get documents from database
         boolean ok = true;
         while (iterator.hasNext()) {
             final StagingfileType stagingfileType = iterator.next();
@@ -522,7 +514,7 @@ public class OrInstructionTest {
         instructionType.setTask(taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
-        OrIterator iterator = dao.load(na, fileSet); // get documents from database
+        OrIterator iterator = dao.load(instructionType); // get documents from database
 
         // Write the instruction to the fs
         InstructionFilesystemImpl doaFilesystem = new InstructionFilesystemImpl();
@@ -545,7 +537,7 @@ public class OrInstructionTest {
         instructionManager.InstructionIngest(instructionType);
 
         // Results
-        iterator = dao.load(na, fileSet);
+        iterator = dao.load(instructionType);
         int count = 0;
         while (iterator.hasNext()) {
             final StagingfileType stagingfileType = iterator.next();
@@ -585,7 +577,7 @@ public class OrInstructionTest {
         instructionType.setTask(taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
-        OrIterator iterator = dao.load(na, fileSet);
+        OrIterator iterator = dao.load(instructionType);
 
         InstructionFilesystemImpl doaFilesystem = new InstructionFilesystemImpl();
         doaFilesystem.setMarshaller(marshaller);
@@ -604,7 +596,7 @@ public class OrInstructionTest {
 
         doaFilesystem.persist(orFsIterator);
         instructionManager.InstructionUpload(iterator.getInstruction());
-        iterator = dao.load(na, fileSet);
+        iterator = dao.load(iterator.getInstruction());
         Map statusCodes = Utils.statusCodes(iterator);
         Assert.assertEquals(16, statusCodes.get(InstructionException.ExpectFileUpsert));
     }

@@ -140,11 +140,11 @@ public final class InstructionValidateService extends ServiceBaseImp {
         StagingfileType stagingfileType = instruction.getFileByLocation(Normalizers.toRelative(instruction.getInstruction().getFileSet(), file));
         if (wrongFileContent(file, instruction, stagingfileType)) {
             instruction.add(stagingfileType);
-        }
-
-        if (stagingfileType.getPid() == null) {
-            autocreateService.addPid(instruction, stagingfileType);
-            instruction.add(stagingfileType);
+        } else {
+            if (stagingfileType.getPid() == null) {
+                autocreateService.addPid(instruction, stagingfileType);
+                instruction.add(stagingfileType);
+            }
         }
     }
 

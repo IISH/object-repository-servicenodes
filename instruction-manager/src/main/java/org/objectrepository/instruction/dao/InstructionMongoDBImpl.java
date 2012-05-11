@@ -25,12 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Datasource for MongoDB
@@ -66,13 +61,8 @@ public class InstructionMongoDBImpl implements InstructionDao {
 
         final String fileSet = Normalizers.normalize(instruction.getFileSet());
         instruction.setFileSet(fileSet);
-        String collectionName = getCollectionName(orInstruction, instruction.getNa(), fileSet);
+        final String collectionName = getCollectionName(stagingfile, instruction.getNa(), fileSet);
         mongoTemplate.dropCollection(collectionName);
-        mongoTemplate.dropCollection(getCollectionName(stagingfile, instruction.getNa(), fileSet));
-        mongoTemplate.insert(instruction, collectionName);
-        mongoTemplate.getCollection(collectionName).ensureIndex("fileSet");
-
-        collectionName = getCollectionName(stagingfile, instruction.getNa(), fileSet);
         mongoTemplate.getCollection(collectionName).ensureIndex("location");
         return new OrMongoDBIterator(instruction, mongoTemplate, collectionName, orInstruction);
     }
@@ -81,36 +71,19 @@ public class InstructionMongoDBImpl implements InstructionDao {
     /**
      * load
      *
-     * Calling this method will load an instruction and global settings from the collections.
-     * Console argument are preserved.
+     * Initializes the OrInstruction Iterator wrapper
      *
      * The result can be null in unit tests.
-     */
+     **/
     public OrIterator load(InstructionType instruction) throws Exception {
-        OrIterator i = load(instruction.getNa(), instruction.getFileSet());
-        if (i == null) {
-            log.warn("No profile in database. Assuming we are running a unit test.");
-            i = new OrMongoDBIterator(instruction, mongoTemplate, stagingfile, orInstruction);
-        }
-        //syncProfile(i.getInstruction());
-        i.getInstruction().setTask(instruction.getTask());
-        return i;
+
+        return new OrMongoDBIterator(instruction, mongoTemplate, stagingfile, orInstruction);
     }
 
     @Override
-    /**
-     * load
-     *
-     * Calling this method will load an instruction from the collection.
-     */
-    public OrMongoDBIterator load(String na, String fileSet) throws Exception {
-        final Query query = new Query(new Criteria("fileSet").is(Normalizers.normalize(fileSet)));
-        final InstructionType instruction = mongoTemplate.findOne(query, InstructionType.class, orInstruction);
-        if (instruction == null) {
-            log.warn("Instruction was not found in collection: " + fileSet);
-            return null;
-        }
-        return new OrMongoDBIterator(instruction, mongoTemplate, stagingfile, orInstruction);
+    public OrIterator load(String na, String location) throws Exception {
+
+        throw new Exception("Method not implemented for " + this.getClass().getName());
     }
 
     /**
@@ -129,24 +102,11 @@ public class InstructionMongoDBImpl implements InstructionDao {
 
         final String fileSet = instruction.getInstruction().getFileSet();
         final DBObject query = new BasicDBObject("fileSet", fileSet);
-        final List<String> collections = new ArrayList<String>();
-        collections.add(stagingfile);
-
-        final DBObject one = mongoTemplate.getCollection(orInstruction).findOne(query);
-        collections.add(orInstruction);
-        for (String to : collections) {
-            mongoTemplate.getCollection(to).remove(query);
-            final String from = getCollectionName(to, instruction.getInstruction().getNa(), fileSet);
-            final String cmd = "db." + from + ".find().forEach(function(x){db." + to + ".insert(x)})";
-            mongoTemplate.getDb().doEval(cmd);
-        }
-        mongoTemplate.dropCollection(getCollectionName(orInstruction, instruction.getInstruction().getNa(), fileSet));
+        mongoTemplate.getCollection(stagingfile).remove(query);
+        final String from = getCollectionName(stagingfile, instruction.getInstruction().getNa(), fileSet);
+        final String cmd = "db." + from + ".find().forEach(function(x){db." + stagingfile + ".insert(x)})";
+        mongoTemplate.getDb().doEval(cmd);
         mongoTemplate.dropCollection(getCollectionName(stagingfile, instruction.getInstruction().getNa(), fileSet));
-
-        if (one != null) {
-            Update update = Update.update("task", one.get("task")).set("workflow", one.get("workflow"));
-            mongoTemplate.getCollection(orInstruction).update(query, update.getUpdateObject(), true, false);
-        }
     }
 
     public void delete(String fileSet) {

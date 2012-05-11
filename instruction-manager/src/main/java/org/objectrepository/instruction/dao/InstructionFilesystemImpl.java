@@ -48,7 +48,7 @@ public class InstructionFilesystemImpl implements InstructionDao {
 
     @Override
     public OrIterator load(InstructionType instruction) throws Exception {
-        return load(instruction.getNa(), instruction.getFileSet());
+        throw new Exception("Method not implemented for " + this.getClass().getName());
     }
 
     @Override

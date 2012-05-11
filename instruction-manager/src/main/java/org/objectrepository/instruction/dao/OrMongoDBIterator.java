@@ -4,7 +4,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
-import com.mongodb.util.JSON;
 import org.apache.log4j.Logger;
 import org.objectrepository.instruction.InstructionType;
 import org.objectrepository.instruction.StagingfileType;
@@ -13,6 +12,7 @@ import org.objectrepository.util.Counting;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 public class OrMongoDBIterator implements OrIterator {
 
@@ -50,15 +50,25 @@ public class OrMongoDBIterator implements OrIterator {
 
     private void updateProcessed(String fileSet) {
         final DBObject query = new BasicDBObject("fileSet", fileSet);
-        final DBObject update = (DBObject) JSON.parse(String.format("{$set:{task.processed:%s}}", ++processed));
-        mongoTemplate.getCollection(orFileCollection).update(query, update, true, false, WriteConcern.NONE);
+        final Update update = Update.update("task.processed", ++processed);
+        mongoTemplate.getCollection(orFileCollection).update(query, update.getUpdateObject(), true, false,
+                WriteConcern.NONE);
     }
 
+    /**
+     * updateExpectedTotal
+     *
+     * Counts the number of files... up to a point. All in order to make a status possible: n of total files
+     * processed.
+     *
+     * @param fileSet
+     */
     private void updateExpectedTotal(String fileSet) {
         final int total = Counting.countFiles(fileSet);
         final DBObject query = new BasicDBObject("fileSet", fileSet);
-        final DBObject update = (DBObject) JSON.parse(String.format("{$set:{task.total:%s, task.processed:0}}", total));
-        mongoTemplate.getCollection(orFileCollection).update(query, update, true, false);
+        final Update update = Update.update("task.total", total).set("task.processed",0);
+        mongoTemplate.getCollection(orFileCollection).update(query, update.getUpdateObject(), true, false,
+                WriteConcern.NONE);
     }
 
 
