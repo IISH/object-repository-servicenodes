@@ -56,4 +56,9 @@ public class OrFsIterator implements OrIterator {
     public int count() {
         return instruction.getStagingfile().size();
     }
+
+    @Override
+    public int countByKey(String key, String value) {
+        return -1;
+    }
 }

@@ -40,6 +40,8 @@ public final class InstructionException extends Exception {
     public static int ExpectAdd = 718;
     public static int ExpectFileAdd = 719;
     public static int ExpectFileUpsert = 720;
+    public static int LidMultiplication = 721;
+    public static int PidMultiplication = 722;
 
 
     static {
@@ -64,6 +66,8 @@ public final class InstructionException extends Exception {
         errorMessages.put("ExpectAdd", addTask("InstructionValidate", ExpectAdd, "The action=update, but there is no such object in the repository. Use action='add' or 'upsert' in stead."));
         errorMessages.put("ExpectFileAdd", addTask("InstructionValidate", ExpectFileAdd, "The action=add, but there is no location for the stagingfile."));
         errorMessages.put("ExpectFileUpsert", addTask("InstructionValidate", ExpectFileUpsert, "The action=upsert, but there is no location for the stagingfile or object in the repository."));
+        errorMessages.put("LidMultiplication", addTask("InstructionValidate", LidMultiplication, "The lid value is used elsewhere in the instruction."));
+        errorMessages.put("PidMultiplication", addTask("InstructionValidate", PidMultiplication, "The pid value is used elsewhere in the instruction."));
     }
 
     public static TaskType getTaskByStatus(String fault) {

@@ -9,6 +9,7 @@ import org.objectrepository.instruction.InstructionType;
 import org.objectrepository.instruction.StagingfileType;
 import org.objectrepository.instruction.TaskType;
 import org.objectrepository.util.Counting;
+import org.objectrepository.util.Normalizers;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -57,7 +58,7 @@ public class OrMongoDBIterator implements OrIterator {
 
     /**
      * updateExpectedTotal
-     *
+     * <p/>
      * Counts the number of files... up to a point. All in order to make a status possible: n of total files
      * processed.
      *
@@ -66,7 +67,7 @@ public class OrMongoDBIterator implements OrIterator {
     private void updateExpectedTotal(String fileSet) {
         final int total = Counting.countFiles(fileSet);
         final DBObject query = new BasicDBObject("fileSet", fileSet);
-        final Update update = Update.update("task.total", total).set("task.processed",0);
+        final Update update = Update.update("task.total", total).set("task.processed", 0);
         mongoTemplate.getCollection(orFileCollection).update(query, update.getUpdateObject(), true, false,
                 WriteConcern.NONE);
     }
@@ -106,6 +107,15 @@ public class OrMongoDBIterator implements OrIterator {
     @Override
     public int count() {
         return cursor.count();
+    }
+
+    @Override
+    public int countByKey(String key, String value) {
+        if (Normalizers.isEmpty(value)) {
+            return -1;
+        }
+        final DBObject query = new BasicDBObject(key, value);
+        return mongoTemplate.getCollection(collectionName).find(query).count();
     }
 
     private static Logger log = Logger.getLogger(OrMongoDBIterator.class);

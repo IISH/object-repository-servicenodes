@@ -11,4 +11,5 @@ public interface OrIterator extends Iterator<StagingfileType> {
     public StagingfileType getFileByLocation(String absolute);
     public InstructionType getInstruction();
     int count();
+    int countByKey(String key, String value);
 }

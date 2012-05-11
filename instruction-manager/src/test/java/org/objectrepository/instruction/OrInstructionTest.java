@@ -169,12 +169,14 @@ public class OrInstructionTest {
         instructionType.setContentType("image/jpg");
         instructionType.setAutoGeneratePIDs("uuid");
         final TaskType taskType = new TaskType();
-        taskType.setName("InstructionIngest");
+        taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
-        taskType.setInfo("InstructionValidate");
+        taskType.setInfo("InstructionAutocreate");
         instructionType.setTask(taskType);
 
         instructionManager.InstructionAutocreate(instructionType);
+
+        taskType.setName("InstructionValidate");
         instructionManager.InstructionValidate(instructionType);
 
         final OrIterator iterator = dao.load(instructionType);
@@ -599,6 +601,63 @@ public class OrInstructionTest {
         iterator = dao.load(iterator.getInstruction());
         Map statusCodes = Utils.statusCodes(iterator);
         Assert.assertEquals(16, statusCodes.get(InstructionException.ExpectFileUpsert));
+    }
+
+    @Test
+    public void PidLidMultiplication() throws Exception {
+
+        // Create an instruction
+        dao.delete(fileSet);
+        InstructionType instructionType = objectFactory.createInstructionType();
+        instructionType.setFileSet(fileSet);
+        instructionType.setNa(na);
+        instructionType.setLabel("My alias for a folder");
+        instructionType.setResolverBaseUrl("http://hdl.handle.net/");
+        instructionType.setAction("add");
+        instructionType.setAccess("open");
+        instructionType.setContentType("image/jpg");
+        instructionType.setAutoGeneratePIDs("uuid");   // Will have using lid
+        final TaskType taskType = new TaskType();
+        taskType.setName("InstructionAutocreate");
+        taskType.setStatusCode(500);
+        taskType.setInfo("testCreate");
+        instructionType.setTask(taskType);
+        instructionManager.InstructionAutocreate(instructionType);
+
+        OrIterator iterator = dao.load(instructionType); // get documents from database
+
+        // Write the instruction to the fs
+        InstructionFilesystemImpl doaFilesystem = new InstructionFilesystemImpl();
+        doaFilesystem.setMarshaller(marshaller);
+        doaFilesystem.setObjectFactory(objectFactory);
+        final OrFsIterator orFsIterator = doaFilesystem.create(iterator.getInstruction());
+        orFsIterator.getInstruction().setAutoGeneratePIDs("lid");
+        orFsIterator.getInstruction().setTask(taskType);
+        orFsIterator.getInstruction().getTask().setName("InstructionUpload");
+        int i = 0;
+        while (iterator.hasNext()) {
+            final StagingfileType stagingfileType = iterator.next();
+            stagingfileType.setLid("lid" + ++i);   // add LID values in the process
+            stagingfileType.setTask(null);
+            orFsIterator.add(stagingfileType);
+        }
+
+        // Add some poison
+        orFsIterator.getInstruction().getStagingfile().get(0).setLid("lidIdentical");
+        orFsIterator.getInstruction().getStagingfile().get(2).setLid("lidIdentical");
+        orFsIterator.getInstruction().getStagingfile().get(4).setPid(na + "/pidIdentical");
+        orFsIterator.getInstruction().getStagingfile().get(6).setPid(na + "/pidIdentical");
+        doaFilesystem.persist(orFsIterator);
+
+        iterator.getInstruction().getTask().setName("InstructionUpload");
+        instructionManager.InstructionUpload(iterator.getInstruction());
+
+        // Results
+        iterator = dao.load(iterator.getInstruction());
+        Map statusCodes = Utils.statusCodes(iterator);
+        Assert.assertEquals(1, statusCodes.get(InstructionException.PidMultiplication));
+        Assert.assertEquals(1, statusCodes.get(InstructionException.LidMultiplication));
+
     }
 
     private static void addSneak() throws IOException {
