@@ -78,7 +78,7 @@ public final class InstructionAutocreateService extends ServiceBaseImp {
      * <p/>
      * The logic will only apply to empty pid fields
      *
-     * @param iterator The container of stagingfiles references
+     * @param iterator        The container of stagingfiles references
      * @param stagingfileType the stagingfile
      */
     public void addPid(OrIterator iterator, StagingfileType stagingfileType) {
@@ -87,11 +87,12 @@ public final class InstructionAutocreateService extends ServiceBaseImp {
             if (autoGeneratePIDs.equalsIgnoreCase("uuid")) {
                 stagingfileType.setPid(PidGenerator.getPidWithNa(iterator.getInstruction().getNa()));
             } else if (autoGeneratePIDs.equalsIgnoreCase("filename2pid")) {
-                stagingfileType.setPid(iterator.getInstruction().getNa() + "/" + FilenameUtils.getBaseName(stagingfileType.getLocation()));
-            } else if (autoGeneratePIDs.equalsIgnoreCase("filename2lid") && Normalizers.isEmpty(stagingfileType.getLid())) {
+                stagingfileType.setPid(iterator.getInstruction().getNa()
+                        + "/" + FilenameUtils.getBaseName(stagingfileType.getLocation()));
+            } else if (autoGeneratePIDs.equalsIgnoreCase("filename2lid")
+                    && Normalizers.isEmpty(stagingfileType.getLid())) {
                 stagingfileType.setLid(FilenameUtils.getBaseName(stagingfileType.getLocation()));
-                stagingfileType.setPid((
-                        getPid(iterator.getInstruction(), stagingfileType.getLid())));
+                stagingfileType.setPid(getPid(iterator.getInstruction(), stagingfileType.getLid()));
             } else if (autoGeneratePIDs.equalsIgnoreCase("lid")) {
                 if (Normalizers.isEmpty(stagingfileType.getLid())) {
                     customInfo(stagingfileType, new InstructionException("LidMissing"));
@@ -115,7 +116,7 @@ public final class InstructionAutocreateService extends ServiceBaseImp {
      * We will create a PID here if there is none.
      *
      * @param instructionType The container of the stagingfiles
-     * @param lid Local identifier
+     * @param lid             Local identifier
      * @return pid Peristant identifier from webservice
      */
     private String getPid(InstructionType instructionType, String lid) {

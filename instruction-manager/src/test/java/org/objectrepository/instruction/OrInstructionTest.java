@@ -441,10 +441,13 @@ public class OrInstructionTest {
 
         final OrIterator iterator = dao.load(instructionType); // get documents from database
         boolean ok = true;
-        while (iterator.hasNext()) {
+        while (iterator.hasNext() && ok) {
             final StagingfileType stagingfileType = iterator.next();
-            final String pid = FilenameUtils.getBaseName(stagingfileType.getLocation());
-            ok = ok && pid.equals(stagingfileType.getLid());
+            final String filename = FilenameUtils.getBaseName(stagingfileType.getLocation());
+
+            // expecting a filename equaling the lid; and a PID with a na/UUID ( a UUID length as a string is 36 )
+            ok = ok && filename.equals(stagingfileType.getLid());
+            ok = ok && stagingfileType.getPid().length() == 42;
         }
         Assert.assertTrue(ok);
     }
