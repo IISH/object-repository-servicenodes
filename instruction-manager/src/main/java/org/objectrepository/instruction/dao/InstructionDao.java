@@ -48,7 +48,7 @@ public interface InstructionDao {
      */
     void persist(OrIterator instructions) throws Exception;
 
-    public void syncProfile(InstructionType instruction) throws Exception;
+    //public void syncProfile(InstructionType instruction) throws Exception;
 
     void delete(String fileSet);
 

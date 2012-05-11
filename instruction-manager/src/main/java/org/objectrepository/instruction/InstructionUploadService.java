@@ -1,15 +1,14 @@
 package org.objectrepository.instruction;
 
+import org.apache.log4j.Logger;
 import org.objectrepository.instruction.dao.InstructionDao;
 import org.objectrepository.instruction.dao.OrIterator;
 import org.objectrepository.util.Normalizers;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -18,7 +17,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
 
 /**
  * Import
@@ -49,7 +51,6 @@ final class InstructionUploadService extends ServiceBaseImp {
 
     private void process(InstructionType mainInstructionType) throws Exception {
 
-
         OrIterator iterator = null;
         final XMLInputFactory xif = XMLInputFactory.newInstance();
         final File file = new File(mainInstructionType.getFileSet(), "instruction.xml");
@@ -60,31 +61,25 @@ final class InstructionUploadService extends ServiceBaseImp {
             if (xsr.getEventType() == XMLStreamReader.START_ELEMENT) {
                 String elementName = xsr.getLocalName();
                 if ("instruction".equals(elementName) && iterator == null) {
-                    final InstructionType fsInstructionType = addInstructionType(xsr);
-                    overwrite(mainInstructionType, fsInstructionType);
-                    iterator = dao.create(fsInstructionType);
-                } else if (iterator != null) {
-                    if ("stagingfile".equals(elementName)) {
-                        StagingfileType stagingfileType = (StagingfileType) addElement(xsr);
-                        stagingfileType.setLocation(Normalizers.normalize(stagingfileType.getLocation()));
-                        stagingfileType.setVersion(0L);
-                        autocreateService.addPid(iterator, stagingfileType);
-                        validateService.isValid(iterator, stagingfileType);
-                        iterator.add(stagingfileType);
-                    } else {
-                        hasNext(xsr);
-                    }
+                    // We ignore any settings in the instruction attributes as all comes from the workflow controller
+                    iterator = dao.create(mainInstructionType);
+                    xsr.next();
+                } else if (iterator != null && ("stagingfile".equals(elementName))) {
+                    StagingfileType stagingfileType = (StagingfileType) addElement(xsr);
+                    stagingfileType.setLocation(Normalizers.normalize(stagingfileType.getLocation()));
+                    stagingfileType.setVersion(0L);
+                    autocreateService.addPid(iterator, stagingfileType);
+                    validateService.isValid(iterator, stagingfileType);
+                    iterator.add(stagingfileType);
+                } else {
+                    xsr.next();
                 }
             } else {
-                hasNext(xsr);
+                xsr.next();
             }
         }
         build(iterator);
         dao.persist(iterator);
-    }
-
-    private void hasNext(XMLStreamReader xsr) throws XMLStreamException {
-        if (xsr.hasNext()) xsr.next();
     }
 
     /**
@@ -105,7 +100,7 @@ final class InstructionUploadService extends ServiceBaseImp {
     /**
      * overwrite
      * <p/>
-     * Key system settings will overrule those set in the instruction
+     * We completely ignore the
      *
      * @param fsInstructionType
      * @throws Exception
@@ -144,30 +139,6 @@ final class InstructionUploadService extends ServiceBaseImp {
             log.warn(e);
             return null;
         }
-        return o.getValue();
-    }
-
-    private InstructionType addInstructionType(XMLStreamReader xsr) {
-
-        StringBuilder sb = new StringBuilder("<instruction xmlns=\"http://objectrepository.org/instruction/1.0/\"");
-        for (int i = 0; i < xsr.getAttributeCount(); i++) {
-            sb.append(" ");
-            sb.append(xsr.getAttributeLocalName(i));
-            sb.append("=");
-            sb.append("\"");
-            sb.append(xsr.getAttributeValue(i));
-            sb.append("\"");
-        }
-        sb.append("/>");
-        ByteArrayInputStream bais = null;
-        try {
-            bais = new ByteArrayInputStream(sb.toString().getBytes("utf-8"));
-        } catch (UnsupportedEncodingException e) {
-
-            e.printStackTrace();
-        }
-        StreamSource source = new StreamSource(bais);
-        JAXBElement<InstructionType> o = (JAXBElement<InstructionType>) marshaller.unmarshal(source);
         return o.getValue();
     }
 

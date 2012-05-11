@@ -69,10 +69,10 @@ public class InstructionFilesystemImpl implements InstructionDao {
         fileOutputStream.close();
     }
 
-    @Override
+    /*@Override
     public void syncProfile(InstructionType instruction) throws Exception {
         throw new Exception("Method not implemented.");
-    }
+    }*/
 
     @Override
     public void delete(String fileSet) {

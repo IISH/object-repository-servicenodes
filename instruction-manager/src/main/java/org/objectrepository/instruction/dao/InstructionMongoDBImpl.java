@@ -15,11 +15,10 @@
  */
 package org.objectrepository.instruction.dao;
 
-import com.mongodb.*;
-import com.mongodb.util.JSON;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.apache.log4j.Logger;
 import org.objectrepository.instruction.InstructionType;
-import org.objectrepository.instruction.TaskType;
 import org.objectrepository.util.Checksum;
 import org.objectrepository.util.Normalizers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +29,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Datasource for MongoDB
@@ -67,8 +64,6 @@ public class InstructionMongoDBImpl implements InstructionDao {
      */
     public OrMongoDBIterator create(InstructionType instruction) throws Exception {
 
-        syncProfile(instruction);
-
         final String fileSet = Normalizers.normalize(instruction.getFileSet());
         instruction.setFileSet(fileSet);
         String collectionName = getCollectionName(orInstruction, instruction.getNa(), fileSet);
@@ -80,61 +75,6 @@ public class InstructionMongoDBImpl implements InstructionDao {
         collectionName = getCollectionName(stagingfile, instruction.getNa(), fileSet);
         mongoTemplate.getCollection(collectionName).ensureIndex("location");
         return new OrMongoDBIterator(instruction, mongoTemplate, collectionName, orInstruction);
-    }
-
-    /**
-     * syncProfile
-     * <p/>
-     * In all cases where we have null values in the supplied instruction, the instruction in the database will
-     * fill in the blanks.
-     * If there are still omissions then the profile will be used to fill in the unknown values.
-     *
-     * @param instruction
-     */
-    public void syncProfile(InstructionType instruction) throws Exception {
-
-        final String fileSet = instruction.getFileSet();
-        assert fileSet != null;
-        File file = new File(fileSet);
-        assert file.exists();
-        assert file.isDirectory();
-        instruction.setTask(null);
-
-        final Map<String, Query> queries = new HashMap<String, Query>(2);
-        queries.put(profile, new Query());
-
-        queries.put(orInstruction, new Query(new Criteria("fileSet").is(fileSet)));
-        final Iterator<String> iterator = queries.keySet().iterator();
-        while (iterator.hasNext()) {
-            String collection = iterator.next();
-            Query query = queries.get(collection);
-            query.addCriteria(new Criteria("na").is(instruction.getNa()));
-            final InstructionType parent = mongoTemplate.findOne(query, InstructionType.class, collection);
-            if (parent == null) {
-                log.warn("No " + collection + " found to fill in the blanks. Are we running a unit test?");
-                continue;
-            }
-            getValue(instruction, parent);
-        }
-
-    }
-
-    private void getValue(InstructionType instruction, InstructionType parent) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        for (Method method : InstructionType.class.getMethods()) {
-            Class<?> rt = method.getReturnType();
-            if (method.getName().startsWith("get") && (rt == Integer.class || rt == Long.class || rt == Boolean.class || rt == String.class || rt == TaskType.class)) {
-                @SuppressWarnings({"NullArgumentToVariableArgMethod"}) Object o = method.invoke(instruction, null);
-                if (o == null) {
-                    //noinspection NullArgumentToVariableArgMethod
-                    o = method.invoke(parent, null);
-                    if (o != null) {
-                        String setter = "s" + method.getName().substring(1);
-                        Method setterMethod = InstructionType.class.getMethod(setter, o.getClass());
-                        setterMethod.invoke(instruction, o);
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -152,7 +92,7 @@ public class InstructionMongoDBImpl implements InstructionDao {
             log.warn("No profile in database. Assuming we are running a unit test.");
             i = new OrMongoDBIterator(instruction, mongoTemplate, stagingfile, orInstruction);
         }
-        syncProfile(i.getInstruction());
+        //syncProfile(i.getInstruction());
         i.getInstruction().setTask(instruction.getTask());
         return i;
     }
@@ -192,8 +132,6 @@ public class InstructionMongoDBImpl implements InstructionDao {
         final List<String> collections = new ArrayList<String>();
         collections.add(stagingfile);
 
-        // At the moment workflows are not preserved...
-        // So we need to keep them here
         final DBObject one = mongoTemplate.getCollection(orInstruction).findOne(query);
         collections.add(orInstruction);
         for (String to : collections) {
@@ -206,11 +144,8 @@ public class InstructionMongoDBImpl implements InstructionDao {
         mongoTemplate.dropCollection(getCollectionName(stagingfile, instruction.getInstruction().getNa(), fileSet));
 
         if (one != null) {
-            DBObject workflow = (DBObject) one.get("workflow");
-            if (workflow != null) {
-                final DBObject update = (DBObject) JSON.parse(String.format("{$set:{workflow:%s}}", JSON.serialize(workflow)));
-                mongoTemplate.getCollection(orInstruction).update(query, update, true, false);
-            }
+            Update update = Update.update("task", one.get("task")).set("workflow", one.get("workflow"));
+            mongoTemplate.getCollection(orInstruction).update(query, update.getUpdateObject(), true, false);
         }
     }
 
