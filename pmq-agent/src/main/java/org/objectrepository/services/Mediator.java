@@ -117,7 +117,7 @@ public class Mediator implements Runnable {
 
         timer.cancel();
 
-        String info = (resultHandler.getExitValue() == 0) ? "Done" : resultHandler.getException().getMessage() + " : " + stdout.toString();
+        String info = (resultHandler.getExitValue() == 0) ? "Done" : "Fail: " + stdout.toString();
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskComplete, info, identifier, resultHandler.getExitValue());
     }
 }
