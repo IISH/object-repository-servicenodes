@@ -15,10 +15,10 @@
  */
 package org.objectrepository;
 
-import org.objectrepository.services.Mediator;
 import org.apache.camel.CamelContext;
 import org.apache.log4j.Logger;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.objectrepository.services.Mediator;
+import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -31,7 +31,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
     private boolean keepRunning = true;
     final private static Logger log = Logger.getLogger(MessageConsumerDaemon.class);
     private Properties properties = new Properties();
-    private ClassPathXmlApplicationContext context;
+    private GenericXmlApplicationContext context;
     private ThreadPoolTaskExecutor taskExecutor;
     private long timer;
     private long period = 30000;
@@ -54,7 +54,10 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
     public void init() {
 
         log.info("Startup service...");
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/META-INF/spring/application-context.xml", "META-INF/spring/dispatcher-servlet.xml");
+        GenericXmlApplicationContext  context = new GenericXmlApplicationContext();
+        context.setValidating(false);
+        context.load("/META-INF/spring/application-context.xml", "META-INF/spring/dispatcher-servlet.xml");
+        context.refresh();
         setContext(context);
         context.registerShutdownHook();
         this.taskExecutor = context.getBean(ThreadPoolTaskExecutor.class);
@@ -98,7 +101,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         System.exit(0);
     }
 
-    public void setContext(ClassPathXmlApplicationContext context) {
+    public void setContext(GenericXmlApplicationContext context) {
         this.context = context;
     }
 

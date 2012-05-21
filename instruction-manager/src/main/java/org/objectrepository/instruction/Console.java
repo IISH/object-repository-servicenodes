@@ -17,8 +17,7 @@
 package org.objectrepository.instruction;
 
 import org.objectrepository.util.InstructionTypeHelper;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -52,7 +51,10 @@ public final class Console {
     }
 
     public static void start(InstructionType instructionType) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        ApplicationContext context = new ClassPathXmlApplicationContext("META-INF/spring/or-manager.xml");
+        GenericXmlApplicationContext context = new GenericXmlApplicationContext();
+        context.setValidating(false);
+        context.load("META-INF/spring/or-manager.xml");
+        context.refresh();
         InstructionManager instructionManager = context.getBean(InstructionManager.class);
         instructionType.getTask().setStatusCode(400);
         InstructionManager.class.getMethod(instructionType.getTask().getName(), InstructionType.class).invoke(instructionManager, instructionType);
