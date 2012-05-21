@@ -99,6 +99,7 @@ public class Mediator implements Runnable {
         } catch (Exception e) {
             timer.cancel();
             HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskError, e.getMessage(), identifier, -1);
+            log.info(e.getMessage());
             return;
         }
 
@@ -110,6 +111,7 @@ public class Mediator implements Runnable {
         } catch (InterruptedException e) {
             timer.cancel();
             HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskError, e.getMessage(), identifier, -1);
+            log.info(e.getMessage());
         } finally {
             Thread.interrupted();
         }
@@ -118,6 +120,7 @@ public class Mediator implements Runnable {
         timer.cancel();
 
         String info = (resultHandler.getExitValue() == 0) ? "Done" : "Fail: " + stdout.toString();
+        log.info(info);
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskComplete, info, identifier, resultHandler.getExitValue());
     }
 }
