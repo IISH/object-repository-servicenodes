@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 public class OrDaoImp implements OrDao {
 
     @Value("#{clientProperties['or.collection.files']}")
-    private String files;
+    private String collection;
 
     @Autowired
     @Qualifier("mongoTemplateOr")
@@ -18,8 +18,8 @@ public class OrDaoImp implements OrDao {
 
     @Override
     public boolean hasFiles(String pid) {
-        final DBObject query = new BasicDBObject("pid", pid);
-        DBObject document = mongoTemplate.getCollection(files).findOne(query);
+        final DBObject query = new BasicDBObject("metadata.pid", pid);
+        DBObject document = mongoTemplate.getCollection(collection).findOne(query);
         return ( document != null );
     }
 }
