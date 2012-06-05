@@ -33,7 +33,7 @@
 
     <xs:complexType name="InstructionType">
         <xs:sequence>
-            <xs:element name="task" type="tns:taskType" minOccurs="0" maxOccurs="1">
+            <xs:element name="workflow" type="tns:taskType" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">task (system): includes workflow step, info, error code
                     </xs:documentation>

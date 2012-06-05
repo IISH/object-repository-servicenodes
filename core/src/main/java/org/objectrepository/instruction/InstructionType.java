@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="task" type="{http://objectrepository.org/instruction/1.0/}taskType" minOccurs="0"/>
+ *         &lt;element name="workflow" type="{http://objectrepository.org/instruction/1.0/}taskType" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://objectrepository.org/instruction/1.0/}stagingfile" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="fileSet" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
@@ -55,13 +55,13 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "InstructionType", namespace = "http://objectrepository.org/instruction/1.0/", propOrder = {
-    "task",
+    "workflow",
     "stagingfile"
 })
 public class InstructionType {
 
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
-    protected TaskType task;
+    protected List<TaskType> workflow;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
     protected List<StagingfileType> stagingfile;
     @XmlAttribute
@@ -99,27 +99,32 @@ public class InstructionType {
     protected String id;
 
     /**
-     * Gets the value of the task property.
+     * Gets the value of the workflow property.
      * 
-     * @return
-     *     possible object is
-     *     {@link TaskType }
-     *     
-     */
-    public TaskType getTask() {
-        return task;
-    }
-
-    /**
-     * Sets the value of the task property.
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the workflow property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link TaskType }
-     *     
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getWorkflow().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link TaskType }
+     * 
+     * 
      */
-    public void setTask(TaskType value) {
-        this.task = value;
+    public List<TaskType> getWorkflow() {
+        if (workflow == null) {
+            workflow = new ArrayList<TaskType>();
+        }
+        return this.workflow;
     }
 
     /**

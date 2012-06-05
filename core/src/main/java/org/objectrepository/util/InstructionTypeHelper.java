@@ -15,6 +15,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.util.List;
 
 /**
  * InstructionTypeHelper
@@ -43,7 +44,7 @@ public class InstructionTypeHelper {
         xstream.setMode(XStream.NO_REFERENCES);
         xstream.alias("instruction", InstructionType.class);
         xstream.alias("stagingfile", StagingfileType.class);
-        xstream.alias("task", TaskType.class);
+        xstream.alias("workflow", TaskType.class);
         return (InstructionType) xstream.fromXML(text);
     }
 
@@ -53,7 +54,7 @@ public class InstructionTypeHelper {
         xstream.setMode(XStream.NO_REFERENCES);
         xstream.alias("instruction", InstructionType.class);
         xstream.alias("stagingfile", StagingfileType.class);
-        xstream.alias("task", TaskType.class);
+        xstream.alias("workflow", TaskType.class);
         return xstream.toXML(instructionType);
     }
 
@@ -103,6 +104,27 @@ public class InstructionTypeHelper {
         }
         return value;
     }
+
+    public static TaskType firstTask(InstructionType instructionType) {
+        final List<TaskType> workflow = instructionType.getWorkflow();
+        return (workflow.size() == 0) ? null : workflow.get(0);
+    }
+
+    public static void setSingleTask(InstructionType instructionType, TaskType taskType) {
+        instructionType.getWorkflow().clear();
+        instructionType.getWorkflow().add(taskType);
+    }
+
+    public static TaskType firstTask(StagingfileType stagingfileType) {
+        final List<TaskType> workflow = stagingfileType.getWorkflow();
+        return (workflow.size() == 0) ? null : workflow.get(0);
+    }
+
+    public static void setSingleTask(StagingfileType stagingfileType, TaskType taskType) {
+        stagingfileType.getWorkflow().clear();
+        stagingfileType.getWorkflow().add(taskType);
+    }
+
 
     private final static Logger log = Logger.getLogger(InstructionTypeHelper.class);
 }

@@ -42,7 +42,8 @@ public final class Console {
             System.out.println("Expected InstructionType.fileSet");
             System.exit(1);
         }
-        if (instructionType.getTask() == null || instructionType.getTask().getName() == null) {
+        TaskType task = InstructionTypeHelper.firstTask(instructionType);
+        if (task == null || task.getName() == null) {
             System.out.println("Expected InstructionType.task with a name set");
             System.exit(1);
         }
@@ -56,8 +57,9 @@ public final class Console {
         context.load("META-INF/spring/or-manager.xml");
         context.refresh();
         InstructionManager instructionManager = context.getBean(InstructionManager.class);
-        instructionType.getTask().setStatusCode(400);
-        InstructionManager.class.getMethod(instructionType.getTask().getName(), InstructionType.class).invoke(instructionManager, instructionType);
+        TaskType task = InstructionTypeHelper.firstTask(instructionType);
+        task.setStatusCode(400);
+        InstructionManager.class.getMethod(task.getName(), InstructionType.class).invoke(instructionManager, instructionType);
     }
 
 

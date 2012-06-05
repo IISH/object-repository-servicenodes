@@ -23,11 +23,11 @@ public class HeartBeats {
                                String identifier, int exitValue) {
 
         final String collectionName = Queue.getCollectionName(messageQueue);
-        final Query query = new Query(new Criteria("task.identifier").is(identifier));
-        final Update update = Update.update("task.statusCode", statusCode).set("task.end",
-                new Date()).set("task.info", info).set("task.exitValue", exitValue);
-        log.info("Update task.identifier:" + identifier +
-                " with update task.exitValue:" + exitValue + ",task.statusCode:" + statusCode);
+        final Query query = new Query(new Criteria("workflow.identifier").is(identifier));
+        final Update update = Update.update("workflow.$.statusCode", statusCode).set("workflow.$.end",
+                new Date()).set("workflow.$.info", info).set("workflow.$.exitValue", exitValue);
+        log.info("Update workflow.$.identifier:" + identifier +
+                " with update exitValue:" + exitValue + ",statusCode:" + statusCode);
         mongoTemplate.updateFirst(query, update, collectionName);
     }
 

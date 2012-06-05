@@ -20,6 +20,7 @@ import org.objectrepository.exceptions.InstructionException;
 import org.objectrepository.instruction.dao.OrIterator;
 import org.objectrepository.instruction.dao.ServiceBase;
 import org.objectrepository.util.Counting;
+import org.objectrepository.util.InstructionTypeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -96,9 +97,10 @@ public abstract class ServiceBaseImp implements ServiceBase {
         customInfo(ft, task);
     }
     public void customInfo(StagingfileType ft, TaskType taskType) {
-        final String info = (ft.getTask() == null) ? taskType.getInfo() : ft.getTask().getInfo() + "; " + taskType.getInfo();
+        final TaskType task = InstructionTypeHelper.firstTask(ft);
+        final String info = (task == null) ? taskType.getInfo() : task.getInfo() + "; " + taskType.getInfo();
         taskType.setInfo(info);
-        ft.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(ft, taskType);
     }
 }
 

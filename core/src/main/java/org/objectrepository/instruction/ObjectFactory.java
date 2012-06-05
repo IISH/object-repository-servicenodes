@@ -35,11 +35,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link InstructionType }
+     * Create an instance of {@link TaskType }
      * 
      */
-    public InstructionType createInstructionType() {
-        return new InstructionType();
+    public TaskType createTaskType() {
+        return new TaskType();
     }
 
     /**
@@ -51,11 +51,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link TaskType }
+     * Create an instance of {@link InstructionType }
      * 
      */
-    public TaskType createTaskType() {
-        return new TaskType();
+    public InstructionType createInstructionType() {
+        return new InstructionType();
     }
 
     /**

@@ -19,6 +19,7 @@ package org.objectrepository.instruction;
 import org.apache.log4j.Logger;
 import org.objectrepository.instruction.dao.OrIterator;
 import org.objectrepository.instruction.dao.ServiceBase;
+import org.objectrepository.util.InstructionTypeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -52,6 +53,7 @@ public final class InstructionIngestService implements ServiceBase {
             final StagingfileType stagingfileType = instruction.next();
             if (instructionValidate.isMarkedAsValid(stagingfileType)) {
                 TaskType task = objectFactory.createTaskType();
+                task.setN(0);
                 task.setInfo("Starting InstructionIngest");
                 task.setName("Start");
                 task.setStatusCode(100);
@@ -60,7 +62,7 @@ public final class InstructionIngestService implements ServiceBase {
                 task.setAttempts(1);
                 task.setLimit(3);
                 task.setExitValue(Integer.MAX_VALUE);
-                stagingfileType.setTask(task);
+                InstructionTypeHelper.setSingleTask(stagingfileType, task);
                 instruction.add(stagingfileType);
             } else {
                 log.warn("Invalid document " + stagingfileType.getLocation());

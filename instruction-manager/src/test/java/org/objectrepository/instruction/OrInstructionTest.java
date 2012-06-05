@@ -30,6 +30,7 @@ import org.objectrepository.instruction.dao.InstructionFilesystemImpl;
 import org.objectrepository.instruction.dao.OrFsIterator;
 import org.objectrepository.instruction.dao.OrIterator;
 import org.objectrepository.tests.Utils;
+import org.objectrepository.util.InstructionTypeHelper;
 import org.objectrepository.util.Normalizers;
 import org.objectrepository.util.PidGenerator;
 import org.objectrepository.util.TestHelperMethods;
@@ -136,7 +137,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
         taskType.setInfo("testCreate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
         // Now test filecount
@@ -172,7 +173,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
         taskType.setInfo("InstructionAutocreate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
 
         instructionManager.InstructionAutocreate(instructionType);
 
@@ -211,7 +212,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionIngest");
         taskType.setStatusCode(500);
         taskType.setInfo("InstructionValidate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
 
         instructionManager.InstructionAutocreate(instructionType);
 
@@ -251,7 +252,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
         taskType.setInfo("testCreate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
         // Now test filecount
@@ -286,7 +287,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionValidate");
         taskType.setStatusCode(500);
         taskType.setInfo("InstructionValidate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
 
         instructionManager.InstructionAutocreate(instructionType);
         instructionManager.InstructionValidate(instructionType);
@@ -327,7 +328,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
         taskType.setInfo("testCreate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
         OrIterator iterator = dao.load(instructionType); // get documents from database
@@ -338,13 +339,13 @@ public class OrInstructionTest {
         doaFilesystem.setObjectFactory(objectFactory);
         final OrFsIterator orFsIterator = doaFilesystem.create(iterator.getInstruction());
         orFsIterator.getInstruction().setAutoGeneratePIDs("lid");
-        orFsIterator.getInstruction().setTask(taskType);
-        orFsIterator.getInstruction().getTask().setName("InstructionUpload");
+        taskType.setName("InstructionUpload");
+        InstructionTypeHelper.setSingleTask(orFsIterator.getInstruction(), taskType);
         int i = 0;
         while (iterator.hasNext()) {
             final StagingfileType stagingfileType = iterator.next();
             stagingfileType.setLid("lid" + ++i);   // add LID values in the process
-            stagingfileType.setTask(null);
+            stagingfileType.getWorkflow().clear();
             orFsIterator.add(stagingfileType);
         }
 
@@ -401,7 +402,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
         taskType.setInfo("testCreate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
         final OrIterator iterator = dao.load(instructionType); // get documents from database
@@ -436,7 +437,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
         taskType.setInfo("testCreate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
         final OrIterator iterator = dao.load(instructionType); // get documents from database
@@ -470,7 +471,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
         taskType.setInfo("testCreate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
         OrIterator iterator = dao.load(instructionType);
@@ -479,8 +480,8 @@ public class OrInstructionTest {
         doaFilesystem.setMarshaller(marshaller);
         doaFilesystem.setObjectFactory(objectFactory);
         final OrFsIterator orFsIterator = doaFilesystem.create(iterator.getInstruction());
-        orFsIterator.getInstruction().setTask(taskType);
-        orFsIterator.getInstruction().getTask().setName("InstructionUpload");
+        taskType.setName("InstructionUpload");
+        InstructionTypeHelper.setSingleTask(orFsIterator.getInstruction(), taskType);
         iterator.getInstruction().setAutoGeneratePIDs("filename2pid");
         while (iterator.hasNext()) {
             orFsIterator.add(iterator.next());
@@ -516,7 +517,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
         taskType.setInfo("testCreate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
         OrIterator iterator = dao.load(instructionType); // get documents from database
@@ -527,12 +528,12 @@ public class OrInstructionTest {
         doaFilesystem.setObjectFactory(objectFactory);
         final OrFsIterator orFsIterator = doaFilesystem.create(iterator.getInstruction());
         orFsIterator.getInstruction().setAutoGeneratePIDs("lid");
-        orFsIterator.getInstruction().getTask().setName("InstructionUpload");
+        InstructionTypeHelper.firstTask(orFsIterator.getInstruction()).setName("InstructionUpload");
         int i = 0;
         while (iterator.hasNext()) {
             final StagingfileType stagingfileType = iterator.next();
             stagingfileType.setLid("lid" + ++i);   // add LID values in the process
-            stagingfileType.setTask(null);
+            stagingfileType.getWorkflow().clear();
             orFsIterator.add(stagingfileType);
         }
 
@@ -579,7 +580,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
         taskType.setInfo("testCreate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
         OrIterator iterator = dao.load(instructionType);
@@ -588,14 +589,14 @@ public class OrInstructionTest {
         doaFilesystem.setMarshaller(marshaller);
         doaFilesystem.setObjectFactory(objectFactory);
         final OrFsIterator orFsIterator = doaFilesystem.create(iterator.getInstruction());
-        orFsIterator.getInstruction().setTask(taskType);
-        orFsIterator.getInstruction().getTask().setName("InstructionUpload");
+        taskType.setName("InstructionUpload");
+        InstructionTypeHelper.setSingleTask(orFsIterator.getInstruction(), taskType);
 
         while (iterator.hasNext()) {
             final StagingfileType stagingfileType = iterator.next();
             stagingfileType.setAction("upsert");
             stagingfileType.setLocation(null);
-            stagingfileType.setTask(null);
+            stagingfileType.getWorkflow().clear();
             orFsIterator.add(stagingfileType);
         }
 
@@ -624,7 +625,7 @@ public class OrInstructionTest {
         taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
         taskType.setInfo("testCreate");
-        instructionType.setTask(taskType);
+        InstructionTypeHelper.setSingleTask(instructionType, taskType);
         instructionManager.InstructionAutocreate(instructionType);
 
         OrIterator iterator = dao.load(instructionType); // get documents from database
@@ -635,13 +636,13 @@ public class OrInstructionTest {
         doaFilesystem.setObjectFactory(objectFactory);
         final OrFsIterator orFsIterator = doaFilesystem.create(iterator.getInstruction());
         orFsIterator.getInstruction().setAutoGeneratePIDs("lid");
-        orFsIterator.getInstruction().setTask(taskType);
-        orFsIterator.getInstruction().getTask().setName("InstructionUpload");
+        taskType.setName("InstructionUpload");
+        InstructionTypeHelper.setSingleTask(orFsIterator.getInstruction(), taskType);
         int i = 0;
         while (iterator.hasNext()) {
             final StagingfileType stagingfileType = iterator.next();
             stagingfileType.setLid("lid" + ++i);   // add LID values in the process
-            stagingfileType.setTask(null);
+            stagingfileType.getWorkflow().clear();
             orFsIterator.add(stagingfileType);
         }
 
@@ -652,7 +653,7 @@ public class OrInstructionTest {
         orFsIterator.getInstruction().getStagingfile().get(6).setPid(na + "/pidIdentical");
         doaFilesystem.persist(orFsIterator);
 
-        iterator.getInstruction().getTask().setName("InstructionUpload");
+        InstructionTypeHelper.firstTask( iterator.getInstruction()).setName("InstructionUpload");
         instructionManager.InstructionUpload(iterator.getInstruction());
 
         // Results

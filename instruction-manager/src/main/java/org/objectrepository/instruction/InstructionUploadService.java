@@ -17,10 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 
 /**
  * Import
@@ -97,22 +94,6 @@ final class InstructionUploadService extends ServiceBaseImp {
         }
     }
 
-    /**
-     * overwrite
-     * <p/>
-     * We completely ignore the
-     *
-     * @param fsInstructionType
-     * @throws Exception
-     */
-    private void overwrite(InstructionType mainInstructionType, InstructionType fsInstructionType) throws Exception {
-        fsInstructionType.setNa(mainInstructionType.getNa());
-        fsInstructionType.setFileSet(Normalizers.normalize(mainInstructionType.getFileSet()));
-        fsInstructionType.setTask(mainInstructionType.getTask());
-        fsInstructionType.setVersion(0L);
-
-    }
-
     private Object addElement(XMLStreamReader xsr) {
 
         final TransformerFactory tf = TransformerFactory.newInstance();
@@ -124,12 +105,14 @@ final class InstructionUploadService extends ServiceBaseImp {
             return null;
         }
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
         try {
             transformer.transform(new StAXSource(xsr), new StreamResult(baos));
         } catch (TransformerException e) {
             log.warn(e);
             return null;
         }
+
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         StreamSource source = new StreamSource(bais);
         JAXBElement o;
@@ -137,6 +120,7 @@ final class InstructionUploadService extends ServiceBaseImp {
             o = (JAXBElement) marshaller.unmarshal(source);
         } catch (Exception e) {
             log.warn(e);
+            log.warn(baos.toString());
             return null;
         }
         return o.getValue();

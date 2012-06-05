@@ -23,21 +23,22 @@
         targetNamespace="http://objectrepository.org/instruction/1.0/">
 
     <xs:include schemaLocation="task.xsd"/>
-    <xs:element name="stagingfile" type="tns:stagingfileType"/>
+    <xs:element name="stagingfile" type="tns:stagingfileType" />
 
     <xs:complexType name="stagingfileType">
-        <xs:all>
+        <xs:sequence>
+            <xs:element name="workflow" type="tns:taskType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">task (system): includes workflow step, info, error code
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element type="xs:string" name="fileSet" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">fileSet: system group identifier</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element type="tns:taskType" name="task" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation xml:lang="en">task : includes workflow step, info, error code
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
+
             <xs:element name="action" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">action : See the access element description.
@@ -108,7 +109,7 @@
                     <xs:documentation xml:lang="en">id: system identifier</xs:documentation>
                 </xs:annotation>
             </xs:element>
-        </xs:all>
+        </xs:sequence>
     </xs:complexType>
 
 </xs:schema>

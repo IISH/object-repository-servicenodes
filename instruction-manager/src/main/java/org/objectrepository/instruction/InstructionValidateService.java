@@ -201,7 +201,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
             }
 
             // make sure a PID or LID value is not repeated.
-            int expect = (instruction.getInstruction().getTask().getName().equals("InstructionValidate")) ? 1 : 0;
+            int expect = (InstructionTypeHelper.firstTask(instruction.getInstruction()).getName().equals("InstructionValidate")) ? 1 : 0;
             int count = instruction.countByKey("lid", stagingfileType.getLid());
             if (count != -1 && count != expect) {
                 throw new InstructionException("LidMultiplication");
@@ -221,7 +221,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
     public StagingfileType setMissingSection(String fileSet, File file) {
         StagingfileType stagingfileType = new StagingfileType();
         stagingfileType.setLocation(Normalizers.toRelative(fileSet, file.getPath()));
-        stagingfileType.setTask(InstructionException.getTaskByStatus("MissingFileSection"));
+        InstructionTypeHelper.setSingleTask(stagingfileType, InstructionException.getTaskByStatus("MissingFileSection"));
         return stagingfileType;
     }
 
@@ -258,7 +258,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
      * @return
      */
     public boolean isMarkedAsValid(StagingfileType stagingfileType) {
-        TaskType task = stagingfileType.getTask();
+        TaskType task = InstructionTypeHelper.firstTask(stagingfileType);
         if (task == null) return true;
         return (!task.getName().equalsIgnoreCase("InstructionValidated") &&
                 (task.getStatusCode() < 700 || task.getStatusCode() > 799));

@@ -5,14 +5,18 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -76,55 +80,75 @@ public class Commandizer {
 
     private static void parseDocument(CommandLine command, Document dom) {
 
-        final List<String> keys = new ArrayList<String>();
-
-        try {
-            NodeList nl = dom.getDocumentElement().getChildNodes();
-            //get a nodelist of elements like task, stagingfile
-            for (int i = 0; i < nl.getLength(); i++) {
-
-                //get the child node
-                org.w3c.dom.Node node = nl.item(i);
-
-                NodeList child_nl = node.getChildNodes();
-
-                for (int j = 0; j < child_nl.getLength(); j++) {  // access, contentType, etc
-                    //get the next child node
-                    org.w3c.dom.Node child_node = child_nl.item(j);
-
-                    //If node is Element
-                    if (child_node.getNodeType() == Node.ELEMENT_NODE) {
-                        String key = "-" + child_node.getNodeName();
-                        String value = escaping(child_node.getTextContent());
-                        if (value != null && !keys.contains(key)) {
-                            keys.add(key);
-                            //command.addArgument("-request.instruction." + key);
-                            command.addArgument(key);
-                            command.addArgument(value, false);
-                            log.debug("Added to command " + key + " = " + value);
-                        }
-                    }
-                }
+        ArrayList<String> keys = new ArrayList<String>();
+        String[] xpaths = new String[]{"//text()", "//@*"};
+        for (String xpath : xpaths) {
+            try {
+                parseNodes(GetNode(dom, xpath), command, keys);
+            } catch (XPathExpressionException e) {
+                e.printStackTrace();
+                return;
             }
-
-            Element or = dom.getDocumentElement();
-            NamedNodeMap attr = or.getAttributes();
-            for (int i = 0; i < attr.getLength(); i++) {
-                Node node = attr.item(i);
-                final String value = escaping(node.getNodeValue());
-                final String key = "-" + node.getNodeName();
-                if (value != null && !keys.contains(key)) {
-                    keys.add(key);
-                    //command.addArgument("-request.instruction." + key);
-                    command.addArgument(key);
-                    command.addArgument(value, false);
-                    log.debug("Added to command " + key + " = " + value);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+    }
+
+    private static void parseNodes(NodeList nodelist, CommandLine command, ArrayList<String> keys) {
+        for (int i = 0; i < nodelist.getLength(); i++) {
+            Node node = nodelist.item(i);
+            final String value = escaping(node.getNodeValue());
+            String name = (node.getNodeType() == Node.ATTRIBUTE_NODE) ? node.getNodeName() : node.getParentNode().getNodeName();
+            final String key = "-" + name;
+            if (value != null && !keys.contains(key)) {
+                keys.add(key);
+                command.addArgument(key);
+                command.addArgument(value, false);
+                log.debug("Added to command " + key + " = " + value);
+            }
+        }
+    }
+
+    private static NodeList GetNode(Node node, String xquery) throws XPathExpressionException {
+        XPathExpression expr = getXPathExpression(xquery);
+        return (NodeList) expr.evaluate(node, XPathConstants.NODESET);
+    }
+
+    private static XPathExpression getXPathExpression(String xquery) throws XPathExpressionException {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xpath = factory.newXPath();
+
+        // http://www.ibm.com/developerworks/library/x-javaxpathapi.html
+        NamespaceContext ns = new NamespaceContext() {
+
+            @Override
+            public String getPrefix(String namespaceURI) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public Iterator getPrefixes(String namespaceURI) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public String getNamespaceURI(String prefix) {
+                final String or = "http://objectrepository.org/instruction/1.0/";
+                if (prefix == null)
+                    throw new NullPointerException(or);
+
+                if (prefix.equalsIgnoreCase("or"))
+                    return or;
+
+                if (prefix.equalsIgnoreCase("xml"))
+                    return XMLConstants.XML_NS_URI;
+
+                return XMLConstants.NULL_NS_URI;
+            }
+        };
+
+        xpath.setNamespaceContext(ns);
+        XPathExpression expr = xpath.compile(xquery);
+
+        return expr;
     }
 
     /**
@@ -136,6 +160,7 @@ public class Commandizer {
      * @param text
      * @return
      */
+
     private static String escaping(String text) {
 
         if (text == null || text.trim().isEmpty())

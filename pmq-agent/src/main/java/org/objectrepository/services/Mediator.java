@@ -58,14 +58,14 @@ public class Mediator implements Runnable {
             return;
         }
 
-        final String identifier = instructionType.getTask().getIdentifier();
-
-        final DBObject query = new BasicDBObject("task.identifier", identifier);
+        final String identifier = instructionType.getWorkflow().get(0).getIdentifier();
+        final DBObject query = new BasicDBObject("workflow.identifier", identifier);
         final String collectionName = Queue.getCollectionName(messageQueue);
         if (mongoTemplate.getCollection(collectionName).findOne(query) == null) {
             log.warn("Ignoring message because it's task(identifier=" + identifier + ") no longer not exist in the collection " + collectionName);
             return;
         }
+
         log.info("Message received: " + identifier);
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskReceipt, "Task received", identifier, 0);
 
@@ -89,9 +89,6 @@ public class Mediator implements Runnable {
 
         //Executing the command
         final CommandLine commandLine = Commandizer.makeCommand(shellScript, message);
-        //commandLine.addArgument("-instruction");
-        ///commandLine.addArgument(InstructionTypeHelper.instructionTypeToJson(instructionType).replace("\"", "'"), true);
-        //Result Handler for executing the process in a Asynch way
         DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
         log.debug("Executing command: " + commandLine.toString());
         try {

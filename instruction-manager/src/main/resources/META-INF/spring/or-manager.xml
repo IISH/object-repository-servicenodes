@@ -38,7 +38,6 @@
     <bean id="datasource" class="org.objectrepository.instruction.dao.InstructionMongoDBImpl"/>
 
     <bean id="orDaoImp" class="org.objectrepository.instruction.dao.OrDaoImp"/>
-    <!---->
     <bean id="objectfactory" class="org.objectrepository.instruction.ObjectFactory"/>
 
     <bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">

@@ -9,6 +9,7 @@ import org.objectrepository.instruction.InstructionType;
 import org.objectrepository.instruction.StagingfileType;
 import org.objectrepository.instruction.TaskType;
 import org.objectrepository.util.Counting;
+import org.objectrepository.util.InstructionTypeHelper;
 import org.objectrepository.util.Normalizers;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -38,8 +39,9 @@ public class OrMongoDBIterator implements OrIterator {
     public void add(StagingfileType stagingfile) {
         stagingfile.setFileSet(instruction.getFileSet());
         log.info("Saving record " + stagingfile.getLocation());
-        final TaskType task = stagingfile.getTask();
+        final TaskType task = InstructionTypeHelper.firstTask(stagingfile);
         if (task != null) {
+            task.setN(0);
             task.setTotal(0);
             task.setAttempts(0);
             task.setExitValue(Integer.MAX_VALUE);
@@ -50,8 +52,8 @@ public class OrMongoDBIterator implements OrIterator {
     }
 
     private void updateProcessed(String fileSet) {
-        final DBObject query = new BasicDBObject("fileSet", fileSet);
-        final Update update = Update.update("task.processed", ++processed);
+        final DBObject query = new BasicDBObject("fileSet", fileSet).append("workflow.n", 0);
+        final Update update = Update.update("workflow.$.processed", ++processed);
         mongoTemplate.getCollection(orFileCollection).update(query, update.getUpdateObject(), true, false,
                 WriteConcern.NONE);
     }
@@ -66,8 +68,8 @@ public class OrMongoDBIterator implements OrIterator {
      */
     private void updateExpectedTotal(String fileSet) {
         final int total = Counting.countFiles(fileSet);
-        final DBObject query = new BasicDBObject("fileSet", fileSet);
-        final Update update = Update.update("task.total", total).set("task.processed", 0);
+        final DBObject query = new BasicDBObject("fileSet", fileSet).append("workflow.n", 0);
+        final Update update = Update.update("workflow.$.total", total).set("workflow.$.processed", 0);
         mongoTemplate.getCollection(orFileCollection).update(query, update.getUpdateObject(), true, false,
                 WriteConcern.NONE);
     }
@@ -77,7 +79,7 @@ public class OrMongoDBIterator implements OrIterator {
     public StagingfileType getFileByLocation(String location) {
         final Query query = new Query(new Criteria("location").is(location).and("fileSet").is(instruction.getFileSet()));
         final StagingfileType stagingfileType = mongoTemplate.findOne(query, StagingfileType.class, collectionName);
-        if (stagingfileType != null) stagingfileType.setTask(null);
+        if (stagingfileType != null) stagingfileType.getWorkflow().clear();
         return stagingfileType;
     }
 

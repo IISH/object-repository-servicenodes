@@ -32,6 +32,11 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="xs:int" name="n" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">n : index</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element type="xs:int" name="statusCode" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">statusCode : for programmatic handling</xs:documentation>
@@ -76,7 +81,8 @@
             </xs:element>
             <xs:element name="identifier" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation xml:lang="en">identifier : System property. Used to maintain state between clients and to
+                    <xs:documentation xml:lang="en">identifier : System property. Used to maintain state between clients
+                        and to
                         avoid staleness and task duplication.
                     </xs:documentation>
                 </xs:annotation>

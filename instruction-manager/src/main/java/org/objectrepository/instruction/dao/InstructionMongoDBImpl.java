@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.util.ArrayList;
+
 /**
  * Datasource for MongoDB
  *
@@ -118,7 +120,7 @@ public class InstructionMongoDBImpl implements InstructionDao {
     @Override
     public void removetasks(InstructionType instruction) {
         final DBObject query = new BasicDBObject("fileSet", Normalizers.normalize(instruction.getFileSet()));
-        final Update update = new Update().unset("task");
+        final Update update = new Update().set("workflow", new ArrayList(0));
         mongoTemplate.getCollection(stagingfile).updateMulti(query, update.getUpdateObject());
     }
 

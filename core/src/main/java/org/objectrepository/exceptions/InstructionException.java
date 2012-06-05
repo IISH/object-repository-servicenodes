@@ -76,6 +76,7 @@ public final class InstructionException extends Exception {
 
     private static TaskType addTask(String name, int statusCode, String info) {
         TaskType task = new TaskType();
+        task.setN(0);
         task.setName(name);
         task.setStatusCode(statusCode);
         task.setInfo(info);

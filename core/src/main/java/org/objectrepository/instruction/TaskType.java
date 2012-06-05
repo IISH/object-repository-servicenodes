@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;all>
  *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="n" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="statusCode" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="info" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="processed" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
@@ -42,6 +43,8 @@ public class TaskType {
 
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/", required = true)
     protected String name;
+    @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
+    protected int n;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
     protected int statusCode;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
@@ -81,6 +84,22 @@ public class TaskType {
      */
     public void setName(String value) {
         this.name = value;
+    }
+
+    /**
+     * Gets the value of the n property.
+     * 
+     */
+    public int getN() {
+        return n;
+    }
+
+    /**
+     * Sets the value of the n property.
+     * 
+     */
+    public void setN(int value) {
+        this.n = value;
     }
 
     /**

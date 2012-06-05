@@ -30,7 +30,7 @@ public class commandizerTest {
         String message = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<instruction xmlns=\"http://objectrepository.org/instruction/1.0/\" access=\"restricted\" contentType=\"image/jpg\" na=\"12345\"\n" +
                 "    lidPrefix=\"HU:OSA:380:\" resolverBaseUrl=\"http://hdl.handle.net/\" label=\"My alias for a folder\"\n" +
-                "    fileSet=\"./instruction-manager/src/test/resources/test-collection/\">\n" +
+                "    fileSet=\"./instruction-manager/src/test/resources/test-collection/\" dummy3=\"3\">\n" +
                 "    <stagingfile>\n" +
                 "        <contentType>image/jpeg</contentType>\n" +
                 "        <pid>10891/HU:OSA:380:12345</pid>\n" +
@@ -41,22 +41,17 @@ public class commandizerTest {
                 "        <dummy1></dummy1>\n" +
                 "        <dummy2/>\n" +
                 "    </stagingfile>\n" +
-                "    <task>\n" +
+                "    <workflow><task>\n" +
                 "        <name>InstructionAutoCreate</name>\n" +
                 "        <statusCode>30</statusCode>\n" +
-                "    </task>\n" +
+                "    </task></workflow>\n" +
                 "</instruction>";
 
         CommandLine cmd = Commandizer.makeCommand("/opt/bash.sh", message);
         System.out.println("And the command is:");
         System.out.println(cmd);
         List<String> arguments = Arrays.asList(cmd.getArguments());
-        Assert.assertEquals(arguments.size(), 28);
-        /*Assert.assertTrue(arguments.contains("-request.instruction.stagingfile.md5"));
-        Assert.assertTrue(arguments.contains("-request.instruction.stagingfile.pid"));
-        Assert.assertTrue(arguments.contains("-request.instruction.task.status"));
-        Assert.assertTrue(arguments.contains("-request.instruction.access"));
-        Assert.assertTrue(arguments.contains("-request.instruction.stagingfile.access"));*/
+        Assert.assertEquals(28, arguments.size());
         Assert.assertTrue(arguments.contains("-name"));
         Assert.assertTrue(arguments.contains("InstructionAutoCreate"));
         Assert.assertTrue(arguments.contains("-md5"));
@@ -66,6 +61,7 @@ public class commandizerTest {
         Assert.assertTrue(arguments.contains("-access"));
         Assert.assertTrue(arguments.contains("closed"));
         Assert.assertTrue(arguments.contains("30"));
+        Assert.assertTrue(arguments.contains("-dummy3"));
         Assert.assertFalse(arguments.contains("open"));
         Assert.assertFalse(arguments.contains(""));
         Assert.assertFalse(arguments.contains(null));

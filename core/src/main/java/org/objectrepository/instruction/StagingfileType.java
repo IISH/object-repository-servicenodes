@@ -1,6 +1,8 @@
 
 package org.objectrepository.instruction;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -16,9 +18,9 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="stagingfileType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;all>
+ *       &lt;sequence>
+ *         &lt;element name="workflow" type="{http://objectrepository.org/instruction/1.0/}taskType" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="fileSet" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="task" type="{http://objectrepository.org/instruction/1.0/}taskType" minOccurs="0"/>
  *         &lt;element name="action" minOccurs="0">
  *           &lt;simpleType>
  *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
@@ -38,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="access" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="version" type="{http://www.w3.org/2001/XMLSchema}long"/>
  *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *       &lt;/all>
+ *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -48,14 +50,25 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "stagingfileType", namespace = "http://objectrepository.org/instruction/1.0/", propOrder = {
-
+    "workflow",
+    "fileSet",
+    "action",
+    "pid",
+    "lid",
+    "location",
+    "md5",
+    "length",
+    "contentType",
+    "access",
+    "version",
+    "id"
 })
 public class StagingfileType {
 
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
-    protected String fileSet;
+    protected List<TaskType> workflow;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
-    protected TaskType task;
+    protected String fileSet;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
     protected String action;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
@@ -76,6 +89,35 @@ public class StagingfileType {
     protected long version;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
     protected String id;
+
+    /**
+     * Gets the value of the workflow property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the workflow property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getWorkflow().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link TaskType }
+     * 
+     * 
+     */
+    public List<TaskType> getWorkflow() {
+        if (workflow == null) {
+            workflow = new ArrayList<TaskType>();
+        }
+        return this.workflow;
+    }
 
     /**
      * Gets the value of the fileSet property.
@@ -99,30 +141,6 @@ public class StagingfileType {
      */
     public void setFileSet(String value) {
         this.fileSet = value;
-    }
-
-    /**
-     * Gets the value of the task property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link TaskType }
-     *     
-     */
-    public TaskType getTask() {
-        return task;
-    }
-
-    /**
-     * Sets the value of the task property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TaskType }
-     *     
-     */
-    public void setTask(TaskType value) {
-        this.task = value;
     }
 
     /**
