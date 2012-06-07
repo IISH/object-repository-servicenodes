@@ -136,7 +136,7 @@ public class Checksum {
     private static String metadataFile(File file) throws IOException {
 
         final File md5File = new File(file.getAbsoluteFile() + ".md5");
-        return (md5File.exists()) ? parse(new FileInputStream(md5File)) : null;
+        return (md5File.exists() && md5File.length() != 0) ? parse(new FileInputStream(md5File)) : null;
     }
 
     /**
