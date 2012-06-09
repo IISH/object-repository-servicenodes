@@ -146,21 +146,18 @@ public class Commandizer {
         };
 
         xpath.setNamespaceContext(ns);
-        XPathExpression expr = xpath.compile(xquery);
 
-        return expr;
+        return xpath.compile(xquery);
     }
 
     /**
      * escaping
      * <p/>
-     * Surrounds the argument with quotes where we have spaces in the argument
      * Escapes key tokens of Linux ( we will target this OS )
      *
      * @param text
      * @return
      */
-
     private static String escaping(String text) {
 
         if (text == null || text.trim().isEmpty())
@@ -171,11 +168,6 @@ public class Commandizer {
         escapeChars.add('\\');
 
         final StringBuilder sb = new StringBuilder(text.trim());
-        if (sb.indexOf(" ") != -1) {
-            sb.insert(0, "\"");
-            sb.append("\"");
-        }
-
         for (int i = sb.length() - 1; i != -1; i--) {
             char c = sb.charAt(i);
             if (escapeChars.contains(c)) {
