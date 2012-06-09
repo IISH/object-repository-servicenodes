@@ -20,7 +20,7 @@ import java.util.Timer;
  * Listens to a queue; accepts the message and parses the message into command line parameters.
  *
  * @author Lucien van Wouw <lwo@iisg.nl>
- * @author: Jozsef Gabor Bone <bonej@ceu.hu>
+ * @author Jozsef Gabor Bone <bonej@ceu.hu>
  */
 public class Mediator implements Runnable {
 
@@ -106,18 +106,18 @@ public class Mediator implements Runnable {
             resultHandler.waitFor();
             failure = false;
         } catch (InterruptedException e) {
-            timer.cancel();
             HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskError, e.getMessage(), identifier, -1);
-            log.info(e.getMessage());
+            log.error(e.getMessage());
         } finally {
             Thread.interrupted();
         }
+        timer.cancel();
         if (failure) return;
 
-        timer.cancel();
-
-        String info = (resultHandler.getExitValue() == 0) ? "Done" : "Fail: " + stdout.toString();
-        log.info(info);
+        final String s = stdout.toString();
+        final String info = (resultHandler.getExitValue() == 0) ? "Done" : "Fail: " + s;
+        log.info("resultHandler.exitValue=" + resultHandler.getExitValue());
+        log.info("resultHandler.stdout=" + s);
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskComplete, info, identifier, resultHandler.getExitValue());
     }
 }
