@@ -41,6 +41,12 @@
             </xs:element>
             <xs:element ref="tns:stagingfile" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
+        <xs:attribute name="plan">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">plan : A list of comma separated services that are to be invoked. These
+                    are: StagingfileIngestMaster, StagingFileBindPIDs, StagingfileIngestLevel1, StagingfileIngestLevel2, StagingfileIngestLevel3</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
         <xs:attribute name="fileSet">
             <xs:annotation>
                 <xs:documentation xml:lang="en">fileSet (system): The root folder containing all sub folder and

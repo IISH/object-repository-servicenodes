@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="workflow" type="{http://objectrepository.org/instruction/1.0/}taskType" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://objectrepository.org/instruction/1.0/}stagingfile" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
+ *       &lt;attribute name="plan" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="fileSet" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="label" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="autoGeneratePIDs" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
@@ -64,6 +65,9 @@ public class InstructionType {
     protected List<TaskType> workflow;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
     protected List<StagingfileType> stagingfile;
+    @XmlAttribute
+    @XmlSchemaType(name = "anySimpleType")
+    protected String plan;
     @XmlAttribute
     @XmlSchemaType(name = "anySimpleType")
     protected String fileSet;
@@ -154,6 +158,30 @@ public class InstructionType {
             stagingfile = new ArrayList<StagingfileType>();
         }
         return this.stagingfile;
+    }
+
+    /**
+     * Gets the value of the plan property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getPlan() {
+        return plan;
+    }
+
+    /**
+     * Sets the value of the plan property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setPlan(String value) {
+        this.plan = value;
     }
 
     /**
