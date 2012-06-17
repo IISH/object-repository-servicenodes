@@ -23,7 +23,7 @@ public class OrGet extends OrFilesFactory {
         final DBObject query = new BasicDBObject("metadata.pid", getA());
         final GridFSDBFile gridFSDBFile = getGridFS().findOne(query);
         if (gridFSDBFile == null) {
-            log.warn("No such stagingfile in database: " + query.toString());
+            log.warn("No such file in database: " + query.toString());
             return;
         }
 

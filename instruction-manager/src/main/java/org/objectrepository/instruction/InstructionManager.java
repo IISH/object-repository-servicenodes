@@ -94,6 +94,7 @@ public final class InstructionManager {
     }
 
     public void InstructionIngest(InstructionType instructionType) {
+        dao.removetasks(instructionType);
         try {
             OrIterator instruction = dao.load(instructionType);
             instructionInstructionIngest.build(instruction);
