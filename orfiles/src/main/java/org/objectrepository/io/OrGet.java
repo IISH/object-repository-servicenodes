@@ -19,7 +19,6 @@ public class OrGet extends OrFilesFactory {
     public void action() throws OrFilesException {
 
         assert getL() != null;
-
         final DBObject query = new BasicDBObject("metadata.pid", getA());
         final GridFSDBFile gridFSDBFile = getGridFS().findOne(query);
         if (gridFSDBFile == null) {

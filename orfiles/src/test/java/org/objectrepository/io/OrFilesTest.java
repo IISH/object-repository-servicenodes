@@ -40,7 +40,7 @@ public class OrFilesTest {
         Assert.assertFalse("Unit test should really not contain a stagingfile until the action is called to download it from the database.", downLoadFile.exists());
 
         final String md5 = Checksum.getMD5(f);
-        add(md5, bucket, url);
+        add(md5, bucket, url, null);
 
         OrGet getFile = new OrGet();
         getFile.setMongo(hosts);
@@ -56,7 +56,7 @@ public class OrFilesTest {
         downLoadFile.delete();
     }
 
-    private void add(String pid, String bucket, URL url) throws OrFilesException {
+    private void add(String pid, String bucket, URL url, String md5) throws OrFilesException {
 
         if (url == null) url = getClass().getResource(file);
         final OrPut putFile = new OrPut();
@@ -64,8 +64,29 @@ public class OrFilesTest {
         putFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
         putFile.setD(db);// database
         putFile.setB(bucket);
+        putFile.setM(md5);
         putFile.setL(url.getFile());
         putFile.setA(pid);
+        putFile.setEnvironment("test");
         putFile.action();
+    }
+
+    @Test
+    public void removeMD5mismatch() throws Exception {
+        final URL url = getClass().getResource(file);
+        final File f = new File(url.getFile());
+        final File downLoadFile = new File(f.getParent(), "test.stagingfile");
+        downLoadFile.delete();
+        Assert.assertFalse("Unit test should really not contain a stagingfile until the action is called to download it from the database.", downLoadFile.exists());
+
+        final String pid = Checksum.getMD5(f);
+        add(pid, bucket, url, null);
+
+        final String md5Liar = "000000000000FF";
+        try {
+            add(pid, bucket, url, md5Liar);
+        } catch (OrFilesException e) {
+            Assert.assertTrue("Test threw the wrong exception: " + e.getMessage() + ". Should be complaining about the md5 mismatch.", e.getMessage().contains(md5Liar));
+        }
     }
 }

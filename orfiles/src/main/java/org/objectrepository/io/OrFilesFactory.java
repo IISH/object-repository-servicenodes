@@ -69,8 +69,10 @@ public abstract class OrFilesFactory implements OrFiles {
         return mongo.getDB(getD()).getCollection(getB() + ".files"); // Mongo convention: .files and .chunks
     }
 
+    private GridFS gridFS = null;
     public GridFS getGridFS() {
-        return new GridFS(mongo.getDB(getD()), getB());
+        if ( gridFS == null ) gridFS = new GridFS(mongo.getDB(getD()), getB());
+        return gridFS;
     }
 
     /**
