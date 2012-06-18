@@ -146,7 +146,7 @@ public class OrInstructionTest {
 
         // We should have two errors, so two tasks
         Map statusCodes = Utils.statusCodes(iterator);
-        Assert.assertEquals("Ought to have one tasks because one stagingfile was zero in length", 2, statusCodes.get(InstructionException.FileZeroSize));
+        Assert.assertEquals("Ought to have one tasks because one stagingfile was zero in length", 1, statusCodes.get(InstructionException.FileZeroSize));
     }
 
     /**
@@ -182,8 +182,8 @@ public class OrInstructionTest {
 
         final OrIterator iterator = dao.load(instructionType);
         Map statusCodes = Utils.statusCodes(iterator);
-        Assert.assertEquals("Ought to have two tasks because files are zero in length", 2, statusCodes.get(InstructionException.FileZeroSize));
-        Assert.assertEquals("14 documents ought to be fine", 14, statusCodes.get(0));
+        Assert.assertEquals("Ought to have one task because it is zero in length", 1, statusCodes.get(InstructionException.FileZeroSize));
+        Assert.assertEquals("15 documents ought to be fine", 15, statusCodes.get(0));
     }
 
     /**
@@ -209,7 +209,7 @@ public class OrInstructionTest {
         instructionType.setContentType("image/jpg");
         instructionType.setAutoGeneratePIDs("none");
         final TaskType taskType = new TaskType();
-        taskType.setName("InstructionIngest");
+        taskType.setName("InstructionAutocreate");
         taskType.setStatusCode(500);
         taskType.setInfo("InstructionValidate");
         InstructionTypeHelper.setSingleTask(instructionType, taskType);
@@ -219,12 +219,12 @@ public class OrInstructionTest {
         // Re-write the instruction to the fs
 
         instructionType.setAutoGeneratePIDs("filename2lid");
+        taskType.setName("InstructionValidate");
         instructionManager.InstructionValidate(instructionType);
-
         final OrIterator iterator = dao.load(instructionType);
         Map statusCodes = Utils.statusCodes(iterator);
-        Assert.assertEquals("Ought to have two tasks because files are zero in length", 2, statusCodes.get(InstructionException.FileZeroSize));
-        Assert.assertEquals("14 documents ought to be fine", 14, statusCodes.get(0));
+        Assert.assertEquals("Ought to have one task because it is zero in length", 1, statusCodes.get(InstructionException.FileZeroSize));
+        Assert.assertEquals("15 documents ought to be fine", 15, statusCodes.get(0));
     }
 
     /**
@@ -261,8 +261,8 @@ public class OrInstructionTest {
         Assert.assertEquals(16, iterator.count());
         Map statusCodes = Utils.statusCodes(iterator);
         Assert.assertNull(statusCodes.get(0));
-        Assert.assertEquals(2, statusCodes.get(InstructionException.FileZeroSize));
-        Assert.assertEquals(14, statusCodes.get(InstructionException.PidMissing));
+        Assert.assertEquals(1, statusCodes.get(InstructionException.FileZeroSize));
+        Assert.assertEquals(15, statusCodes.get(InstructionException.PidMissing));
     }
 
     /**
@@ -296,8 +296,8 @@ public class OrInstructionTest {
         // We should have PID errors
         Map statusCodes = Utils.statusCodes(iterator);
         Assert.assertNull(statusCodes.get(0));
-        Assert.assertEquals(2, statusCodes.get(InstructionException.FileZeroSize));
-        Assert.assertEquals(14, statusCodes.get(InstructionException.PidMissing));
+        Assert.assertEquals(1, statusCodes.get(InstructionException.FileZeroSize));
+        Assert.assertEquals(15, statusCodes.get(InstructionException.PidMissing));
     }
 
     /**
@@ -377,7 +377,7 @@ public class OrInstructionTest {
         Assert.assertEquals(1, statusCodes.get(InstructionException.FileDoesNotExist));
         Assert.assertEquals(1, statusCodes.get(InstructionException.MD5Missing));
         Assert.assertEquals(1, statusCodes.get(InstructionException.MD5Mismatch));
-        Assert.assertEquals(2, statusCodes.get(InstructionException.FileZeroSize));
+        Assert.assertEquals(1, statusCodes.get(InstructionException.FileZeroSize));
         Assert.assertEquals(1, statusCodes.get(InstructionException.MissingFileSection));
         final StagingfileType stagingfileByLocation = iterator.getFileByLocation(fileWithPid);
         Assert.assertNotNull(stagingfileByLocation);
@@ -653,7 +653,7 @@ public class OrInstructionTest {
         orFsIterator.getInstruction().getStagingfile().get(6).setPid(na + "/pidIdentical");
         doaFilesystem.persist(orFsIterator);
 
-        InstructionTypeHelper.firstTask( iterator.getInstruction()).setName("InstructionUpload");
+        InstructionTypeHelper.firstTask(iterator.getInstruction()).setName("InstructionUpload");
         instructionManager.InstructionUpload(iterator.getInstruction());
 
         // Results

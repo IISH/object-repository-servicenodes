@@ -20,8 +20,8 @@ import org.objectrepository.exceptions.InstructionException;
 import org.objectrepository.instruction.dao.OrDaoImp;
 import org.objectrepository.instruction.dao.OrIterator;
 import org.objectrepository.util.Checksum;
-import org.objectrepository.util.Normalizers;
 import org.objectrepository.util.InstructionTypeHelper;
+import org.objectrepository.util.Normalizers;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
