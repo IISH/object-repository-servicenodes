@@ -42,6 +42,7 @@ public final class InstructionException extends Exception {
     public static int ExpectFileUpsert = 720;
     public static int LidMultiplication = 721;
     public static int PidMultiplication = 722;
+    public static int MD5Multiplication = 723;
 
 
     static {
@@ -68,6 +69,7 @@ public final class InstructionException extends Exception {
         errorMessages.put("ExpectFileUpsert", addTask("InstructionValidate", ExpectFileUpsert, "The action=upsert, but there is no location for the stagingfile or object in the repository."));
         errorMessages.put("LidMultiplication", addTask("InstructionValidate", LidMultiplication, "The lid value is used elsewhere in the instruction."));
         errorMessages.put("PidMultiplication", addTask("InstructionValidate", PidMultiplication, "The pid value is used elsewhere in the instruction."));
+        errorMessages.put("MD5Multiplication", addTask("InstructionValidate", PidMultiplication, "The md5 value is used elsewhere in the instruction."));
     }
 
     public static TaskType getTaskByStatus(String fault) {

@@ -211,6 +211,12 @@ public final class InstructionValidateService extends ServiceBaseImp {
                 throw new InstructionException("PidMultiplication");
             }
 
+            // make sure the md5 is not repeated.
+            count = instruction.countByKey("md5", stagingfileType.getMd5());
+            if (count != -1 && count != expect) {
+                throw new InstructionException("MD5Multiplication");
+            }
+
         } catch (InstructionException se) {
             customInfo(stagingfileType, se);
             return true;
