@@ -1,6 +1,11 @@
 package org.objectrepository.io;
 
-import org.junit.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.gridfs.GridFSDBFile;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.objectrepository.exceptions.OrFilesException;
 import org.objectrepository.util.Checksum;
 
@@ -11,6 +16,7 @@ public class OrFilesTest {
 
     final static private String[] hosts = new String[]{"localhost"};
     final static private String file = "/xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx";
+    final static private String fileUpdate = "/xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx.update";
     final static private String db = "test";
     final static private String bucket = "level12345";
 
@@ -75,9 +81,6 @@ public class OrFilesTest {
     public void removeMD5mismatch() throws Exception {
         final URL url = getClass().getResource(file);
         final File f = new File(url.getFile());
-        final File downLoadFile = new File(f.getParent(), "test.stagingfile");
-        downLoadFile.delete();
-        Assert.assertFalse("Unit test should really not contain a stagingfile until the action is called to download it from the database.", downLoadFile.exists());
 
         final String pid = Checksum.getMD5(f);
         add(pid, bucket, url, null);
@@ -87,6 +90,54 @@ public class OrFilesTest {
             add(pid, bucket, url, md5Liar);
         } catch (OrFilesException e) {
             Assert.assertTrue("Test threw the wrong exception: " + e.getMessage() + ". Should be complaining about the md5 mismatch.", e.getMessage().contains(md5Liar));
+        }
+    }
+
+    @Test
+    public void update() throws OrFilesException {
+
+        final URL url = getClass().getResource(file);
+        final URL urlUpdate = getClass().getResource(fileUpdate);
+        final File f = new File(url.getFile());
+        final String pid = Checksum.getMD5(f);
+
+        add(pid, bucket, url, null);
+        add(pid, bucket, urlUpdate, null);
+
+        final OrPut putFile = new OrPut();
+        putFile.setMongo(hosts);
+        putFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
+        putFile.setD(db);// database
+        putFile.setB(bucket);
+        final GridFSDBFile document = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", pid));
+        Assert.assertNotNull(document);
+        Assert.assertEquals(document.getMetaData().get("pid"), pid);
+    }
+
+    @Test
+    public void differentPIDs() throws OrFilesException {
+
+        final URL url = getClass().getResource(file);
+        final URL urlUpdate = getClass().getResource(fileUpdate);
+        final File f = new File(url.getFile());
+        final String pid = Checksum.getMD5(f);
+
+        final OrPut putFile = new OrPut();
+        putFile.setMongo(hosts);
+        putFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
+        putFile.setD(db);// database
+        putFile.setB(bucket);
+
+        add(pid, bucket, url, null);
+        for (int i = 0; i < 10; i++) {
+            final String p = pid + "." + i;
+            add(p, bucket, urlUpdate, null);
+        }
+
+        for (int i = 0; i < 10; i++) {
+            final String p = pid + "." + i;
+            final GridFSDBFile document = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", p));
+            Assert.assertNotNull(document);
         }
     }
 }
