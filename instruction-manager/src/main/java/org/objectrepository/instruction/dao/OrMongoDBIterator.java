@@ -24,20 +24,22 @@ public class OrMongoDBIterator implements OrIterator {
     private InstructionType instruction;
     private DBCursor cursor;
     private int processed = 0;
+    private String fileSet;
 
     public OrMongoDBIterator(InstructionType instruction, MongoTemplate mongoTemplate, String collectionName, String orFileCollection) {
         this.mongoTemplate = mongoTemplate;
         this.instruction = instruction;
         this.collectionName = collectionName;
         this.orFileCollection = orFileCollection;
-        updateExpectedTotal(instruction.getFileSet());
-        DBObject query = new BasicDBObject("fileSet", instruction.getFileSet());
+        fileSet = instruction.getFileSet();
+        updateExpectedTotal();
+        DBObject query = new BasicDBObject("fileSet", fileSet);
         cursor = mongoTemplate.getCollection(collectionName).find(query);
     }
 
     @Override
     public void add(StagingfileType stagingfile) {
-        stagingfile.setFileSet(instruction.getFileSet());
+        stagingfile.setFileSet(fileSet);
         log.info("Saving record " + stagingfile.getLocation());
         final TaskType task = InstructionTypeHelper.firstTask(stagingfile);
         if (task != null) {
@@ -63,10 +65,8 @@ public class OrMongoDBIterator implements OrIterator {
      * <p/>
      * Counts the number of files... up to a point. All in order to make a status possible: n of total files
      * processed.
-     *
-     * @param fileSet
      */
-    private void updateExpectedTotal(String fileSet) {
+    private void updateExpectedTotal() {
         final int total = Counting.countFiles(fileSet);
         final DBObject query = new BasicDBObject("fileSet", fileSet).append("workflow.n", 0);
         final Update update = Update.update("workflow.$.total", total).set("workflow.$.processed", 0);
@@ -77,7 +77,7 @@ public class OrMongoDBIterator implements OrIterator {
 
     @Override
     public StagingfileType getFileByLocation(String location) {
-        final Query query = new Query(new Criteria("location").is(location).and("fileSet").is(instruction.getFileSet()));
+        final Query query = new Query(new Criteria("location").is(location).and("fileSet").is(fileSet));
         final StagingfileType stagingfileType = mongoTemplate.findOne(query, StagingfileType.class, collectionName);
         if (stagingfileType != null) stagingfileType.getWorkflow().clear();
         return stagingfileType;
@@ -116,7 +116,7 @@ public class OrMongoDBIterator implements OrIterator {
         if (Normalizers.isEmpty(value)) {
             return -1;
         }
-        final DBObject query = new BasicDBObject(key, value);
+        final DBObject query = new BasicDBObject(key, value).append("fileSet", fileSet);
         return mongoTemplate.getCollection(collectionName).find(query).count();
     }
 
