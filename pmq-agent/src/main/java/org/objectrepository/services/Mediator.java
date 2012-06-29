@@ -27,7 +27,7 @@ public class Mediator implements Runnable {
     final private static Logger log = Logger.getLogger(Mediator.class);
     private static final int StatusCodeTaskReceipt = 400;
     private static final int StatusCodeTaskComplete = 500;
-    private static final int StatusCodeTaskError = 700;
+    private static final int StatusCodeTaskError = 500;
 
     private MongoTemplate mongoTemplate;
     private ConsumerTemplate consumer;
