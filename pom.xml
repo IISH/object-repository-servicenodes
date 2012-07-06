@@ -93,7 +93,7 @@
         <slf4j.version>1.6.1</slf4j.version>
         <xstream.version>1.4.2</xstream.version>
         <jettison.version>1.0.1</jettison.version>
-        <mongodb.version>2.7.3<!-- Current version 2.7.3. When changing this version, we need to modify the over classed
+        <mongodb.version>2.8.0<!-- Current version 2.8.0. When changing this version, we need to modify the over classed
          GridFSInputFile in the corresponding package. --></mongodb.version>
         <or.core.version>1.0</or.core.version>
     </properties>

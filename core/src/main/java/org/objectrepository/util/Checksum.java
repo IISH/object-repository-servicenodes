@@ -100,6 +100,18 @@ public class Checksum {
         return md5;
     }
 
+    public static String getMD5(byte[] writeBuffer) {
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        }
+        md.update(writeBuffer);
+        byte[] mdbytes = md.digest();
+        return getHex(mdbytes);
+    }
+
     private static String createMD5file(File file, String md5) {
         try {
             final String md5sum = System.getProperty("md5sum");
