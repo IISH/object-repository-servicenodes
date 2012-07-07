@@ -14,7 +14,7 @@ import java.security.MessageDigest;
  * <p/>
  * Inserts md5 checksum in chunks.
  */
-public class OrMd5 extends OrFilesFactory {
+public class OrMdq5 extends OrFilesFactory {
 
     private DBCollection _chunkCollection;
     private int count = 0;
@@ -88,5 +88,5 @@ public class OrMd5 extends OrFilesFactory {
     };
 
 
-    private static Logger log = Logger.getLogger(OrMd5.class);
+    private static Logger log = Logger.getLogger(OrMdq5.class);
 }
