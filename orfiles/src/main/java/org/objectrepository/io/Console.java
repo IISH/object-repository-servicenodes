@@ -44,6 +44,7 @@ public final class Console {
         defaults.put("-m", null);// the md5
         defaults.put("-c", "files");// the collection. Default is "files"
         defaults.put("-a", null);// the alias
+        defaults.put("-s", "");// the shardKey prefix
         defaults.put("-t", "application/octet-stream");// the contentType
         defaults.put("-M", "Get"); // method
         return defaults;

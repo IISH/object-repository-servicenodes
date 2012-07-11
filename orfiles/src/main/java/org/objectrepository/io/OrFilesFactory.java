@@ -15,7 +15,7 @@ import java.io.File;
 
 /**
  * OrFilesFactory
- *
+ * <p/>
  * FSGrid implementation for uploading and downloading files.
  * Class is a factory and domain combo.
  * <p/>
@@ -43,6 +43,7 @@ public abstract class OrFilesFactory implements OrFiles {
     private String q;
     private String t;
     private String a;
+    private String s;
 
     public Mongo getMongo() {
         return mongo;
@@ -70,8 +71,9 @@ public abstract class OrFilesFactory implements OrFiles {
     }
 
     private GridFS gridFS = null;
+
     public GridFS getGridFS() {
-        if ( gridFS == null ) gridFS = new GridFS(mongo.getDB(getD()), getB());
+        if (gridFS == null) gridFS = new GridFS(mongo.getDB(getD()), getB());
         return gridFS;
     }
 
@@ -143,15 +145,24 @@ public abstract class OrFilesFactory implements OrFiles {
     }
 
     public void setM(String m) {
-         this.m = m;
+        this.m = m;
     }
 
     public String getNa() {
-       return null; //return m.getNa();
+        return null; //return m.getNa();
     }
 
     public String getNamespace() {
         return collection;
+    }
+
+    public void setS(String s) {
+        this.s = s;
+    }
+
+    public String getS() {
+        if (s == null || s.startsWith("{")) s = "";
+        return s;
     }
 
     public String getPid() {
@@ -159,11 +170,11 @@ public abstract class OrFilesFactory implements OrFiles {
     }
 
     public String getContentType() {
-       return null;
+        return null;
     }
 
     public String getAccess() {
-         return null;
+        return null;
     }
 
     public String getLabel() {

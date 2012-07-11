@@ -74,6 +74,7 @@ public class OrFilesTest {
         putFile.setL(url.getFile());
         putFile.setA(pid);
         putFile.setEnvironment("test");
+        putFile.setS("00");
         putFile.action();
     }
 

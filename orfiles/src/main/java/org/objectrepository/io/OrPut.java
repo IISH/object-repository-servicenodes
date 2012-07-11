@@ -19,7 +19,7 @@ import java.util.UUID;
  */
 public class OrPut extends OrFilesFactory {
 
-    private static String longPadding = "%" + String.valueOf((int) Math.sqrt(Long.SIZE) * 2) + "s";
+    //private static String longPadding = "%" + String.valueOf((int) Math.sqrt(Long.SIZE) * 2) + "s";
     private String environment;
 
     /**
@@ -39,7 +39,8 @@ public class OrPut extends OrFilesFactory {
             throw new OrFilesException("Staging file not found; or the length of the file was zero bytes.");
         }
 
-        final String shardKey = Checksum.getMD5(getPid() + "/" + UUID.randomUUID().toString()) + "0000000000000000"; // + String.format(longPadding, Long.toHexString(0)).replace(' ', '0');
+        final String shardKey = getS() + Checksum.getMD5(getPid() + "/" + UUID.randomUUID().toString()).substring(getS().length()) + "0000000000000000"; // + String.format(longPadding, Long.toHexString(0)).replace(' ', '0');
+        if (shardKey.length() != 48) throw new OrFilesException("Shardkey " + shardKey + " must be of length 48");
         final BasicDBObject query = new BasicDBObject("metadata.pid", getPid());
         final GridFSDBFile document = getGridFS().findOne(query);
         if (document != null && document.getLength() == fileLength && Checksum.compare(document.getMD5(), getMd5())) {
