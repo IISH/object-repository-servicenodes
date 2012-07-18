@@ -20,21 +20,22 @@ import org.apache.log4j.Logger;
 import org.objectrepository.services.Mediator;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.RejectedExecutionHandler;
 
 public class MessageConsumerDaemon extends Thread implements Runnable {
 
     private static MessageConsumerDaemon instance;
     private boolean keepRunning = true;
     final private static Logger log = Logger.getLogger(MessageConsumerDaemon.class);
-    private Properties properties = new Properties();
     private GenericXmlApplicationContext context;
-    private ThreadPoolTaskExecutor taskExecutor;
     private long timer;
-    private long period = 30000;
+    private long period = 10000;
+    private List<Queue> taskExecutors;
 
     private MessageConsumerDaemon() {
         timer = System.currentTimeMillis() + period;
@@ -44,8 +45,10 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
         init();
         while (keepRunning) {
-            while (taskExecutor.getActiveCount() < taskExecutor.getMaxPoolSize()) {
-                taskExecutor.execute(mediatorInstance());
+            for (Queue queue : taskExecutors) {
+                if (queue.getActiveCount() < queue.getMaxPoolSize()) {
+                    queue.execute(mediatorInstance(queue.getQueueName(), queue.getShellScript()));
+                }
             }
             heartbeat();
         }
@@ -54,21 +57,24 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
     public void init() {
 
         log.info("Startup service...");
-        GenericXmlApplicationContext  context = new GenericXmlApplicationContext();
+        GenericXmlApplicationContext context = new GenericXmlApplicationContext();
         context.setValidating(false);
         context.load("/META-INF/spring/application-context.xml", "META-INF/spring/dispatcher-servlet.xml");
         context.refresh();
         setContext(context);
         context.registerShutdownHook();
-        this.taskExecutor = context.getBean(ThreadPoolTaskExecutor.class);
-        this.taskExecutor.setCorePoolSize(Integer.parseInt(properties.getProperty("-maxTasks")));
-        this.taskExecutor.setMaxPoolSize(Integer.parseInt(properties.getProperty("-maxTasks")));
+
+        final RejectedExecutionHandler rejectedExecutionHandler = context.getBean(RejectedExecutionHandler.class);
+        for (Queue taskExecutor : taskExecutors) {
+            taskExecutor.setRejectedExecutionHandler(rejectedExecutionHandler);
+            taskExecutor.initialize();
+        }
     }
 
-    private Mediator mediatorInstance() {
+    private Mediator mediatorInstance(String queue, String shellScript) {
 
         log.debug("Adding mediator");
-        return new Mediator(context.getBean(MongoTemplate.class), context.getBean(CamelContext.class).createConsumerTemplate(), "activemq:" + properties.getProperty("-messageQueue"), properties.getProperty("-shellScript"), period);
+        return new Mediator(context.getBean(MongoTemplate.class), context.getBean(CamelContext.class).createConsumerTemplate(), "activemq:" + queue, shellScript, period);
     }
 
     /**
@@ -105,8 +111,8 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         this.context = context;
     }
 
-    public void setProperties(Properties properties) {
-        this.properties = properties;
+    public void setTaskExecutors(List<Queue> taskExecutors) {
+        this.taskExecutors = taskExecutors;
     }
 
     /**
@@ -121,20 +127,27 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         throw new CloneNotSupportedException();
     }
 
-    public static synchronized MessageConsumerDaemon getInstance(Properties properties) {
+    public static synchronized MessageConsumerDaemon getInstance(List<Queue> queues) {
 
         if (instance == null) {
             instance = new MessageConsumerDaemon();
-            instance.setProperties(properties);
+            instance.setTaskExecutors(queues);
             instance.setDaemon(true);
         }
         return instance;
     }
 
+    /**
+     * main
+     * <p/>
+     * Accepts one folder as argument:  -messageQueues
+     * That folder ought to contain one or more folders ( or symbolic links ) to the files
+     * The folder has the format: [foldername] or [foldername].[maxTasks]
+     * MaxTasks is to indicate the total number of jobs being able to run.
+     *
+     * @param argv
+     */
     public static void main(String[] argv) {
-
-        String shell;
-        String maxTask;
 
         if (instance == null) {
             final Properties properties = new Properties();
@@ -149,44 +162,51 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                     }
                 }
             } else {
-                System.out.println("Usage: pmq-agent.jar -messageQueue QUEUE_NAME [-shellScript SHELL_SCRIPT_PATH] [-maxTasks TASK_NUMBER]");
-                System.out.println("Default shell script (if not provided): /opt/QUEUE_NAME.sh");
-                System.out.println("Default maximum task number (if not provided): 3");
-                System.exit(0);
-            }
-
-            if (!properties.containsKey("-messageQueue")) {
-                log.fatal("Expected case sensitive parameter: -messageQueue");
+                System.out.println("Usage: pmq-agent.jar -messageQueues queues");
                 System.exit(-1);
             }
 
-            //Get -shellScript property, check if the given stagingfile exists, if it wasn't given or stagingfile doesn't
-            //exists, use default one: /opt/<messageQueueName>.sh.
-            shell = properties.getProperty("-shellScript");
-            if (shell == null)
-                shell = "/opt/" + properties.getProperty("-messageQueue") + ".sh";
-
-            if (new File(shell).exists()) {
-                properties.setProperty("-shellScript", shell);
-            } else {
-                log.fatal("File " + shell + " doesn't exist.");
+            if (!properties.containsKey("-messageQueues")) {
+                System.out.println("Expected case sensitive parameter: -messageQueues");
                 System.exit(-1);
             }
 
-            //Get -maxTasks property, if it wasn't given use default: 3
-            maxTask = "3";
-            if (properties.containsKey("-maxTasks")) {
-                try {
-                    Integer.parseInt(properties.getProperty("-maxTasks"));
-                    maxTask = properties.getProperty("-maxTasks");
-                } catch (NumberFormatException nfe) {
-                    log.fatal("Task number should be an integer value.");
-                    System.exit(-1);
+            final File messageQueues = new File((String) properties.get("-messageQueues"));
+            if (!messageQueues.exists()) {
+                System.out.println("Expected case sensitive parameter: -messageQueues");
+                System.exit(-1);
+            }
+            if (messageQueues.isFile()) {
+                System.out.println("-messageQueues should point to a folder, not a file.");
+                System.exit(-1);
+            }
+
+            final File[] files = messageQueues.listFiles();
+            final List<Queue> queues = new ArrayList<Queue>();
+            for (File file : files) {
+                final String name = file.getName();
+                String[] split = name.split("\\.", 2);
+                String shellScript = file.getAbsolutePath() + "/startup.sh";
+                String queueName = split[0];
+                int maxTask = (split.length == 1) ? 1 : Integer.parseInt(split[1]);
+                System.out.println("Candidate mq client for " + queueName + " maxTasks " + maxTask);
+                if (new File(shellScript).exists()) {
+                    final Queue queue = new Queue(queueName, shellScript);
+                    queue.setQueueCapacity(maxTask);
+                    queue.setMaxPoolSize(maxTask);
+                    queue.setCorePoolSize(maxTask);
+                    queues.add(queue);
+                } else {
+                    System.out.println("... skipping, because no startup script found at " + shellScript);
                 }
             }
-            properties.setProperty("-maxTasks", maxTask);
 
-            getInstance(properties).run();
+            if (queues.size() == 0) {
+                System.out.println("No queue folders seen in " + messageQueues.getAbsolutePath());
+                System.exit(-1);
+            }
+
+            getInstance(queues).run();
         }
     }
 }

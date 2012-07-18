@@ -27,14 +27,18 @@
         <property name="brokerURL" value="#{clientProperties['grails.plugin.routing.jms.brokerURL']}"/>
     </bean>
 
-    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-        <property name="corePoolSize" value="3"/>
-        <property name="maxPoolSize" value="3"/>
-        <property name="queueCapacity" value="10"/>
-        <property name="rejectedExecutionHandler">
-            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
-        </property>
-    </bean>
+    <!--
+        <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+            <property name="corePoolSize" value="3"/>
+            <property name="maxPoolSize" value="3"/>
+            <property name="queueCapacity" value="10"/>
+            <property name="rejectedExecutionHandler">
+                <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
+            </property>
+        </bean>
+    -->
+
+    <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
 
     <bean class="org.objectrepository.instruction.ObjectFactory"/>
 

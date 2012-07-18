@@ -1,6 +1,8 @@
 package org.objectrepository;
 
-import java.util.Properties;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Starts the daemon application.
@@ -9,24 +11,26 @@ import java.util.Properties;
  */
 public class Startup {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        if (args.length == 0)
-            args = new String[]{"-messageQueue", "activemq:controller"};
+        File folder = new File("./pmq-agent/target");
+        folder.mkdirs();
+        String[] testFiles = new String[]{"TestTask1", "TestTask2.2", "TestTask3.3"};
+        for (int i = 0; i < testFiles.length; i++) {
+            File file = new File(folder, testFiles[i]);
+            file.mkdir();
+            FileOutputStream fos = new FileOutputStream(file.getAbsolutePath() + "/startup.sh", false);
+            fos.write(0);
+            fos.close();
+        }
+
+        if (args.length == 0) {
+            args = new String[]{"-messageQueues", folder.getAbsolutePath()};
+        }
 
         final String or = "or.properties";
         if (!System.getProperties().contains(or))
             System.setProperty(or, "or.properties"); // Set this as a VM parameter -Dor.properties
-        String[] params = new String[]{};
-        //MessageConsumerDaemon.main(params);
-
-        Properties p = new Properties();
-        p.put("-maxTasks", "3");
-        p.put("-messageQueue", "InstructionAutocreate");
-        p.put("-shellScript", "notepad.exe");
-
-        MessageConsumerDaemon services = MessageConsumerDaemon.getInstance(p);
-        MessageConsumerDaemon.main(params);
-        services.run(); // Don't use start... we need the IDE thread to hang here.
+        MessageConsumerDaemon.main(args);
     }
 }
