@@ -10,6 +10,9 @@ public final class Queue extends ThreadPoolTaskExecutor {
     public Queue(String queueName, String shellScript) {
         this.queueName = queueName;
         this.shellScript = shellScript;
+        setCorePoolSize(1);
+        setMaxPoolSize(1);
+        setQueueCapacity(1);
     }
 
     public String getQueueName() {

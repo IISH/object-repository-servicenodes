@@ -15,16 +15,16 @@ import java.util.Date;
 import java.util.Timer;
 
 /**
- * Mediator
+ * MediatorQueue
  * <p/>
  * Listens to a queue; accepts the message and parses the message into command line parameters.
  *
  * @author Lucien van Wouw <lwo@iisg.nl>
  * @author Jozsef Gabor Bone <bonej@ceu.hu>
  */
-public class Mediator implements Runnable {
+public class MediatorQueue implements Runnable {
 
-    final private static Logger log = Logger.getLogger(Mediator.class);
+    final private static Logger log = Logger.getLogger(MediatorQueue.class);
     private static final int StatusCodeTaskReceipt = 400;
     private static final int StatusCodeTaskComplete = 500;
     private static final int StatusCodeTaskError = 500;
@@ -35,7 +35,7 @@ public class Mediator implements Runnable {
     private String shellScript;
     private long period;
 
-    public Mediator(MongoTemplate mongoTemplate, ConsumerTemplate consumer, String messageQueue, String shellScript, long period) {
+    public MediatorQueue(MongoTemplate mongoTemplate, ConsumerTemplate consumer, String messageQueue, String shellScript, long period) {
         this.mongoTemplate = mongoTemplate;
         this.consumer = consumer;
         this.messageQueue = messageQueue;

@@ -25,7 +25,7 @@ public class Startup {
         }
 
         if (args.length == 0) {
-            args = new String[]{"-messageQueues", folder.getAbsolutePath()};
+            args = new String[]{"-messageQueues", folder.getAbsolutePath(), "-identifier", "12345"};
         }
 
         final String or = "or.properties";
