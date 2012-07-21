@@ -38,6 +38,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
     private List<Queue> taskExecutors;
     private String identifier;
     final private static Logger log = Logger.getLogger(MessageConsumerDaemon.class);
+    private boolean pause = false;
 
     private MessageConsumerDaemon() {
         timer = System.currentTimeMillis() + period;
@@ -47,13 +48,22 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
         init();
         while (keepRunning) {
-            for (Queue queue : taskExecutors) {
-                if (queue.getActiveCount() < queue.getMaxPoolSize()) {
-                    queue.execute(mediatorInstance(queue.getQueueName(), queue.getShellScript()));
+            if (getPause()) {
+                // Sleep ?
+            } else {
+                for (Queue queue : taskExecutors) {
+                    if (queue.getActiveCount() < queue.getMaxPoolSize()) {
+                        queue.execute(mediatorInstance(queue.getQueueName(), queue.getShellScript()));
+                    }
                 }
             }
             heartbeat();
         }
+
+        for (Queue taskExecutor : taskExecutors) {
+            taskExecutor.shutdown();
+        }
+        taskExecutors.clear();
     }
 
     public void init() {
@@ -107,14 +117,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
     }
 
     public void shutdown() {
-        log.info("Shutting down services...");
         keepRunning = false;
-        for (Queue taskExecutor : taskExecutors) {
-            taskExecutor.shutdown();
-        }
-        taskExecutors.clear();
-        context.close();
-        System.exit(0);
     }
 
     public void setContext(GenericXmlApplicationContext context) {
@@ -245,5 +248,13 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public boolean getPause() {
+        return pause;
+    }
+
+    public void setPause(boolean pause) {
+        this.pause = pause;
     }
 }

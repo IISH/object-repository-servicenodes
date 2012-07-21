@@ -25,15 +25,21 @@ public class MediatorTopic implements Runnable {
         // Some predefined commands
         if (commandLine.equalsIgnoreCase("kill")) {
             messageConsumerDaemon.shutdown();
-        }
-
-        if (commandLine.equalsIgnoreCase("kill " + messageConsumerDaemon.getIdentifier())) {
+        } else if (commandLine.equalsIgnoreCase("kill " + messageConsumerDaemon.getIdentifier())) {
             messageConsumerDaemon.shutdown();
-        }
-
-        log.warn("Command ignored " + commandLine);
+        } else if (commandLine.equalsIgnoreCase("stop")) {
+            messageConsumerDaemon.shutdown();
+        } else if (commandLine.equalsIgnoreCase("stop " + messageConsumerDaemon.getIdentifier())) {
+            messageConsumerDaemon.shutdown();
+        } else if (commandLine.equalsIgnoreCase("start")) {
+            messageConsumerDaemon.setPause(false);
+        } else if (commandLine.equalsIgnoreCase("continue")) {
+            messageConsumerDaemon.setPause(false);
+        } else if (commandLine.equalsIgnoreCase("pause")) {
+            messageConsumerDaemon.setPause(true);
+        } else
+            log.warn("Command ignored " + commandLine);
     }
 
     final private static Logger log = Logger.getLogger(MediatorTopic.class);
-
 }
