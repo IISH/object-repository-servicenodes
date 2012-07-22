@@ -37,6 +37,8 @@ public class MediatorTopic implements Runnable {
             messageConsumerDaemon.setPause(false);
         } else if (commandLine.equalsIgnoreCase("pause")) {
             messageConsumerDaemon.setPause(true);
+        } else if (commandLine.equalsIgnoreCase("sleep")) {
+            messageConsumerDaemon.setPause(true);
         } else
             log.warn("Command ignored " + commandLine);
     }
