@@ -59,11 +59,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             }
             heartbeat();
         }
-
-        for (Queue taskExecutor : taskExecutors) {
-            taskExecutor.shutdown();
-        }
-        taskExecutors.clear();
+        context.close();
     }
 
     public void init() {
@@ -103,7 +99,11 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         long currentTime = System.currentTimeMillis();
         if (timer - currentTime < 0) {
             timer = currentTime + period;
-            log.debug("Heartbeat not implemented");
+            if (getPause()) {
+                log.info("We are in pause mode.");
+            } else {
+                log.info("Actively listening to queues.");
+            }
         }
 
         try {
@@ -114,14 +114,6 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             log.error("Cannot put thread to sleep...");
             shutdown();
         }
-    }
-
-    public void shutdown() {
-        keepRunning = false;
-    }
-
-    public void setContext(GenericXmlApplicationContext context) {
-        this.context = context;
     }
 
     /**
@@ -240,6 +232,15 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
             getInstance(queues, identifier).run();
         }
+        System.exit(0);
+    }
+
+    public void shutdown() {
+        keepRunning = false;
+    }
+
+    public void setContext(GenericXmlApplicationContext context) {
+        this.context = context;
     }
 
     public String getIdentifier() {
