@@ -230,6 +230,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             // Add the system queue
             queues.add(new Queue("Connection", null));
 
+            log.info("There are now " + queues + " executers listening to the queues.");
             getInstance(queues, identifier).run();
         }
         System.exit(0);
