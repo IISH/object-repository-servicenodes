@@ -55,7 +55,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                     if (queue.getActiveCount() < queue.getMaxPoolSize()) {
                         queue.execute(mediatorInstance(queue.getQueueName(), queue.getShellScript()));
                     } else {
-                        log.info(queue.getQueueName() + " has activeCount " + queue.getActiveCount() + " / maxPoolSize " + queue.getMaxPoolSize());
+                        log.debug(queue.getQueueName() + " has activeCount " + queue.getActiveCount() + " / maxPoolSize " + queue.getMaxPoolSize());
                     }
                 }
             }
