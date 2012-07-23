@@ -54,6 +54,8 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 for (Queue queue : taskExecutors) {
                     if (queue.getActiveCount() < queue.getMaxPoolSize()) {
                         queue.execute(mediatorInstance(queue.getQueueName(), queue.getShellScript()));
+                    } else {
+                        log.info(queue.getQueueName() + " has activeCount " + queue.getActiveCount() + " / maxPoolSize " + queue.getMaxPoolSize());
                     }
                 }
             }
@@ -82,7 +84,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
     private Runnable mediatorInstance(String queue, String shellScript) {
 
-        log.debug("Adding mediator");
+        log.info("Adding mediator for " + queue);
         if (shellScript == null) {
             return new MediatorTopic(this, context.getBean(CamelContext.class).createConsumerTemplate(), "activemq:topic:" + queue);
         } else {
@@ -231,7 +233,6 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             // Add the system queue
             queues.add(new Queue("Connection", null));
 
-            log.info("There are now " + queues + " executers listening to the queues.");
             getInstance(queues, identifier).run();
         }
         System.exit(0);
