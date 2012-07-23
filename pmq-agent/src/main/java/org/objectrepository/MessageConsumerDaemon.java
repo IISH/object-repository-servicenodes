@@ -217,9 +217,9 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 log.info("Candidate mq client for " + queueName + " maxTasks " + maxTask);
                 if (new File(shellScript).exists()) {
                     final Queue queue = new Queue(queueName, shellScript);
-                    queue.setCorePoolSize(maxTask);
+                    queue.setCorePoolSize(1);
+                    queue.setMaxPoolSize(maxTask);
                     queue.setQueueCapacity(1);
-                    queue.setMaxPoolSize(1);
                     queues.add(queue);
                 } else {
                     log.warn("... skipping, because no startup script found at " + shellScript);
