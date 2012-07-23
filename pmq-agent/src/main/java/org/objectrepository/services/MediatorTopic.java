@@ -33,9 +33,19 @@ public class MediatorTopic implements Runnable {
             messageConsumerDaemon.shutdown();
         } else if (commandLine.equalsIgnoreCase("start")) {
             messageConsumerDaemon.setPause(false);
+        } else if (commandLine.equalsIgnoreCase("start " + messageConsumerDaemon.getIdentifier())) {
+            messageConsumerDaemon.setPause(false);
         } else if (commandLine.equalsIgnoreCase("continue")) {
             messageConsumerDaemon.setPause(false);
+        } else if (commandLine.equalsIgnoreCase("continue " + messageConsumerDaemon.getIdentifier())) {
+            messageConsumerDaemon.setPause(false);
         } else if (commandLine.equalsIgnoreCase("pause")) {
+            messageConsumerDaemon.setPause(true);
+        } else if (commandLine.equalsIgnoreCase("pause " + messageConsumerDaemon.getIdentifier())) {
+            messageConsumerDaemon.setPause(true);
+        } else if (commandLine.equalsIgnoreCase("sleep")) {
+            messageConsumerDaemon.setPause(true);
+        } else if (commandLine.equalsIgnoreCase("sleep " + messageConsumerDaemon.getIdentifier())) {
             messageConsumerDaemon.setPause(true);
         } else
             log.warn("Command ignored " + commandLine);

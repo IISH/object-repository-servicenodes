@@ -54,7 +54,7 @@ public class MediatorQueue implements Runnable {
             instructionType = InstructionTypeHelper.stringToInstructionType(message);
             instructionType.setLabel(null);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn(e);
             return;
         }
 
