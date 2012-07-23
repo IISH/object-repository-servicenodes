@@ -41,6 +41,12 @@ public class MediatorQueue implements Runnable {
         this.messageQueue = messageQueue;
         this.shellScript = shellScript;
         this.period = period;
+
+        try {
+            consumer.start();
+        } catch (Exception e) {
+            log.error(e);
+        }
     }
 
     @Override

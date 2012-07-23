@@ -14,19 +14,16 @@ public class MediatorTopic implements Runnable {
         this.consumer = consumer;
         this.messageQueue = messageQueue;
         this.messageConsumerDaemon = messageConsumerDaemon;
-
-        try {
-            consumer.start();
-        } catch (Exception e) {
-            log.error(e);
-        }
     }
 
     @Override
     public void run() {
 
         final String commandLine = consumer.receiveBody(messageQueue, String.class);
-        if (commandLine == null || commandLine.trim().isEmpty()) return;
+        if (commandLine == null || commandLine.trim().isEmpty()) {
+            log.warn("The message was empty.");
+            return;
+        }
 
         // Some predefined commands
         if (commandLine.equalsIgnoreCase("kill")) {

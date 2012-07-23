@@ -84,10 +84,11 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
     private Runnable mediatorInstance(String queue, String shellScript) {
 
-        log.info("Adding mediator for " + queue);
         if (shellScript == null) {
+            log.info("Adding topic consumer for " + queue);
             return new MediatorTopic(this, context.getBean(CamelContext.class).createConsumerTemplate(), "activemq:topic:" + queue);
         } else {
+            log.info("Adding queue consumer for " + queue);
             return new MediatorQueue(context.getBean(MongoTemplate.class), context.getBean(CamelContext.class).createConsumerTemplate(), "activemq:" + queue, shellScript, period);
         }
     }
