@@ -41,18 +41,15 @@ public class MediatorQueue implements Runnable {
         this.messageQueue = messageQueue;
         this.shellScript = shellScript;
         this.period = period;
-
-        try {
-            consumer.start();
-        } catch (Exception e) {
-            log.error(e);
-        }
     }
 
     @Override
     public void run() {
 
+        log.debug("Start listening to " + messageQueue);
         String message = consumer.receiveBody(messageQueue, String.class);
+        log.debug("Message received from " + messageQueue + " : " + message);
+
 
         // Make InstructionType object from message
         InstructionType instructionType;
