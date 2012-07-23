@@ -14,6 +14,12 @@ public class MediatorTopic implements Runnable {
         this.consumer = consumer;
         this.messageQueue = messageQueue;
         this.messageConsumerDaemon = messageConsumerDaemon;
+
+        try {
+            consumer.start();
+        } catch (Exception e) {
+            log.error(e);
+        }
     }
 
     @Override
