@@ -76,6 +76,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         for (Queue taskExecutor : taskExecutors) {
             taskExecutor.setRejectedExecutionHandler(rejectedExecutionHandler);
             taskExecutor.initialize();
+            log.info("Initialized " + taskExecutor.getQueueName());
         }
     }
 
@@ -208,7 +209,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 final String name = file.getName();
                 final String[] split = name.split("\\.", 2);
                 final String queueName = split[0];
-                final String shellScript = file.getParent() + "/" + queueName + "/startup.sh";
+                final String shellScript = file.getAbsolutePath() + "/startup.sh";
                 final int maxTask = (split.length == 1) ? 1 : Integer.parseInt(split[1]);
                 log.info("Candidate mq client for " + queueName + " maxTasks " + maxTask);
                 if (new File(shellScript).exists()) {
