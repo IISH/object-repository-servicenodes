@@ -26,27 +26,27 @@ public class MediatorTopic implements Runnable {
         }
 
         // Some predefined commands
-        if (commandLine.equalsIgnoreCase("kill")) {
+        if (commandLine.equalsIgnoreCase("kill all")) {
             messageConsumerDaemon.shutdown();
         } else if (commandLine.equalsIgnoreCase("kill " + messageConsumerDaemon.getIdentifier())) {
             messageConsumerDaemon.shutdown();
-        } else if (commandLine.equalsIgnoreCase("stop")) {
+        } else if (commandLine.equalsIgnoreCase("stop all")) {
             messageConsumerDaemon.shutdown();
         } else if (commandLine.equalsIgnoreCase("stop " + messageConsumerDaemon.getIdentifier())) {
             messageConsumerDaemon.shutdown();
-        } else if (commandLine.equalsIgnoreCase("start")) {
+        } else if (commandLine.equalsIgnoreCase("start all")) {
             messageConsumerDaemon.setPause(false);
         } else if (commandLine.equalsIgnoreCase("start " + messageConsumerDaemon.getIdentifier())) {
             messageConsumerDaemon.setPause(false);
-        } else if (commandLine.equalsIgnoreCase("continue")) {
+        } else if (commandLine.equalsIgnoreCase("continue all")) {
             messageConsumerDaemon.setPause(false);
         } else if (commandLine.equalsIgnoreCase("continue " + messageConsumerDaemon.getIdentifier())) {
             messageConsumerDaemon.setPause(false);
-        } else if (commandLine.equalsIgnoreCase("pause")) {
+        } else if (commandLine.equalsIgnoreCase("pause all")) {
             messageConsumerDaemon.setPause(true);
         } else if (commandLine.equalsIgnoreCase("pause " + messageConsumerDaemon.getIdentifier())) {
             messageConsumerDaemon.setPause(true);
-        } else if (commandLine.equalsIgnoreCase("sleep")) {
+        } else if (commandLine.equalsIgnoreCase("sleep all")) {
             messageConsumerDaemon.setPause(true);
         } else if (commandLine.equalsIgnoreCase("sleep " + messageConsumerDaemon.getIdentifier())) {
             messageConsumerDaemon.setPause(true);

@@ -50,8 +50,6 @@ public class MediatorQueue implements Runnable {
         String message = consumer.receiveBody(messageQueue, String.class);
         log.debug("Message received from " + messageQueue + " : " + message);
 
-
-        // Make InstructionType object from message
         InstructionType instructionType;
         try {
             instructionType = InstructionTypeHelper.stringToInstructionType(message);
@@ -81,7 +79,6 @@ public class MediatorQueue implements Runnable {
         timer.scheduleAtFixedRate(new HeartBeat(mongoTemplate, messageQueue, StatusCodeTaskReceipt, identifier, start), period, period);
 
 
-        //Our main command executor
         DefaultExecutor executor = new DefaultExecutor();
         //Using Std out for the output/error stream - to do it later...
         //http://stackoverflow.com/questions/621596/how-would-you-read-image-data-in-from-a-program-like-image-magick-in-java
@@ -118,7 +115,7 @@ public class MediatorQueue implements Runnable {
         if (failure) return;
 
         final String s = stdout.toString();
-        final String info = (resultHandler.getExitValue() == 0) ? "Done" : "Fail: " + s;
+        final String info = (resultHandler.getExitValue() == 0) ? null : "Fail: " + s;
         log.info("resultHandler.exitValue=" + resultHandler.getExitValue());
         log.info("resultHandler.stdout=" + s);
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskComplete, info, identifier, resultHandler.getExitValue());
