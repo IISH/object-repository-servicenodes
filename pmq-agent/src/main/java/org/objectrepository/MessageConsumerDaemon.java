@@ -48,15 +48,12 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
         init();
         while (keepRunning) {
-            if (getPause()) {
-                // Sleep ?
-            } else {
                 for (Queue queue : taskExecutors) {
-                    if (queue.getActiveCount() < queue.getMaxPoolSize()) {
-                        queue.execute(mediatorInstance(queue.getQueueName(), queue.getShellScript()));
-                    } else {
-                        log.debug(queue.getQueueName() + " has activeCount " + queue.getActiveCount() + " / maxPoolSize " + queue.getMaxPoolSize());
-                    }
+                    if (getPause() && queue.isTopic() || !getPause()) {
+                        if (queue.getActiveCount() < queue.getMaxPoolSize()) {
+                            log.debug(queue.getQueueName() + " has activeCount " + queue.getActiveCount() + " / maxPoolSize " + queue.getMaxPoolSize());
+                            queue.execute(mediatorInstance(queue));
+                        }
                 }
             }
             heartbeat();
@@ -82,14 +79,14 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         }
     }
 
-    private Runnable mediatorInstance(String queue, String shellScript) {
+    private Runnable mediatorInstance(Queue queue) {
 
-        if (shellScript == null) {
-            log.info("Adding topic consumer for " + queue);
-            return new MediatorTopic(this, context.getBean(CamelContext.class).createConsumerTemplate(), "activemq:topic:" + queue);
+        if (queue.isTopic()) {
+            log.info("Adding topic consumer for " + queue.getQueueName());
+            return new MediatorTopic(this, context.getBean(CamelContext.class).createConsumerTemplate(), "activemq:topic:" + queue.getQueueName());
         } else {
-            log.info("Adding queue consumer for " + queue);
-            return new MediatorQueue(context.getBean(MongoTemplate.class), context.getBean(CamelContext.class).createConsumerTemplate(), "activemq:" + queue, shellScript, period);
+            log.info("Adding queue consumer for " + queue.getQueueName());
+            return new MediatorQueue(context.getBean(MongoTemplate.class), context.getBean(CamelContext.class).createConsumerTemplate(), "activemq:" + queue.getQueueName(), queue.getShellScript(), period);
         }
     }
 
@@ -216,7 +213,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 final int maxTask = (split.length == 1) ? 1 : Integer.parseInt(split[1]);
                 log.info("Candidate mq client for " + queueName + " maxTasks " + maxTask);
                 if (new File(shellScript).exists()) {
-                    final Queue queue = new Queue(queueName, shellScript);
+                    final Queue queue = new Queue(queueName, shellScript, false);
                     queue.setCorePoolSize(1);
                     queue.setMaxPoolSize(maxTask);
                     queue.setQueueCapacity(1);
@@ -232,7 +229,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             }
 
             // Add the system queue
-            queues.add(new Queue("Connection", null));
+            queues.add(new Queue("Connection", null, true));
 
             getInstance(queues, identifier).run();
         }
