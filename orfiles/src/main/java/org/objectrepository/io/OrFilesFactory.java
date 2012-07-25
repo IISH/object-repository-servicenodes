@@ -210,6 +210,13 @@ public abstract class OrFilesFactory implements OrFiles {
     public void action() throws OrFilesException {
     }
 
+    /**
+     * Closes the database connection
+     */
+    public void close() {
+        getGridFS().getDB().getMongo().close();
+    }
+
     public static OrFiles newInstance(String method) throws OrFilesException {
         try {
             final String className = OrFiles.class.getPackage().getName() + ".Or" + Invocations.camelCase(method);

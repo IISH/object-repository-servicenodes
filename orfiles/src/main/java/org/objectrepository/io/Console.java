@@ -32,6 +32,7 @@ public final class Console {
         final String[] hosts = args.get("-h").split("\\s|,|;|\t");
         OrFiles.setMongo(hosts);
         OrFiles.action();
+        OrFiles.close();
     }
 
     private Map<String, String> setDefaults() {
