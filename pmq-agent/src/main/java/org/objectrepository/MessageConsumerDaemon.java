@@ -49,19 +49,18 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
         init();
         while (keepRunning) {
-            if (getPause()) {
-                // Sleep ?
-            } else if (getStop()) {
+            if (isStop()) {
                 for (Queue queue : taskExecutors) {
                     keepRunning = keepRunning && (queue.getActiveCount() != 0);
                 }
             } else {
                 for (Queue queue : taskExecutors) {
-                    if (getPause() && queue.isTopic() || !getPause()) {
+                    if (isPause() && queue.isTopic() || !isPause()) {
                         if (queue.getActiveCount() < queue.getMaxPoolSize()) {
                             log.debug(queue.getQueueName() + " has activeCount " + queue.getActiveCount() + " / maxPoolSize " + queue.getMaxPoolSize());
                             queue.execute(mediatorInstance(queue));
                         }
+                    }
                 }
             }
             heartbeat();
@@ -108,7 +107,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         long currentTime = System.currentTimeMillis();
         if (timer - currentTime < 0) {
             timer = currentTime + period;
-            if (getPause()) {
+            if (isPause()) {
                 log.info("We are in pause mode.");
             } else {
                 log.info("Actively listening to queues.");
@@ -255,7 +254,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         this.identifier = identifier;
     }
 
-    public boolean getPause() {
+    public boolean isPause() {
         return pause;
     }
 
@@ -263,7 +262,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         this.pause = pause;
     }
 
-    public boolean getStop() {
+    public boolean isStop() {
         return stop;
     }
 
