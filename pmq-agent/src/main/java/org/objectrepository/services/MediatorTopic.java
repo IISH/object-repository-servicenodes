@@ -27,13 +27,13 @@ public class MediatorTopic implements Runnable {
 
         // Some predefined commands
         if (commandLine.equalsIgnoreCase("kill all")) {
-            messageConsumerDaemon.shutdown();
+            messageConsumerDaemon.setStop(true);
         } else if (commandLine.equalsIgnoreCase("kill " + messageConsumerDaemon.getIdentifier())) {
-            messageConsumerDaemon.shutdown();
+            messageConsumerDaemon.setStop(true);
         } else if (commandLine.equalsIgnoreCase("stop all")) {
-            messageConsumerDaemon.shutdown();
+            messageConsumerDaemon.setStop(true);
         } else if (commandLine.equalsIgnoreCase("stop " + messageConsumerDaemon.getIdentifier())) {
-            messageConsumerDaemon.shutdown();
+            messageConsumerDaemon.setStop(true);
         } else if (commandLine.equalsIgnoreCase("start all")) {
             messageConsumerDaemon.setPause(false);
         } else if (commandLine.equalsIgnoreCase("start " + messageConsumerDaemon.getIdentifier())) {

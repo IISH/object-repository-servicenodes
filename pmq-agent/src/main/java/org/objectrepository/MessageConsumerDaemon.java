@@ -39,6 +39,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
     private String identifier;
     final private static Logger log = Logger.getLogger(MessageConsumerDaemon.class);
     private boolean pause = false;
+    private boolean stop = false;
 
     private MessageConsumerDaemon() {
         timer = System.currentTimeMillis() + period;
@@ -50,6 +51,10 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         while (keepRunning) {
             if (getPause()) {
                 // Sleep ?
+            } else if (getStop()) {
+                for (Queue queue : taskExecutors) {
+                    keepRunning = keepRunning && (queue.getActiveCount() != 0);
+                }
             } else {
                 for (Queue queue : taskExecutors) {
                     if (queue.getActiveCount() < queue.getMaxPoolSize()) {
@@ -115,8 +120,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         } catch (InterruptedException e) {
             interrupt();
         } catch (Throwable t) {
-            log.error("Cannot put thread to sleep...");
-            shutdown();
+            log.error("Cannot put thread to sleep..."); // Can we ignore this ?
         }
     }
 
@@ -239,10 +243,6 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         System.exit(0);
     }
 
-    public void shutdown() {
-        keepRunning = false;
-    }
-
     public void setContext(GenericXmlApplicationContext context) {
         this.context = context;
     }
@@ -261,5 +261,13 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
     public void setPause(boolean pause) {
         this.pause = pause;
+    }
+
+    public boolean getStop() {
+        return stop;
+    }
+
+    public void setStop(boolean stop) {
+        this.stop = stop;
     }
 }
