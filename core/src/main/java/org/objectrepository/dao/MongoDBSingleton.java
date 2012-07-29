@@ -56,7 +56,7 @@ public class MongoDBSingleton {
                 }
             }
             mongo = (replSet.size() == 1)
-                    ? new Mongo(replSet.get(0), options) // Connects to single server
+                    ? new Mongo(replSet.get(0), options) // Connects to single mongod or mongos
                     : new Mongo(replSet, options);   // Connects to replica set
         }
         return mongo;
