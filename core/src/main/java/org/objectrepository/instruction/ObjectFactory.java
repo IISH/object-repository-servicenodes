@@ -35,6 +35,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link InstructionType }
+     * 
+     */
+    public InstructionType createInstructionType() {
+        return new InstructionType();
+    }
+
+    /**
      * Create an instance of {@link StagingfileType }
      * 
      */
@@ -48,14 +56,6 @@ public class ObjectFactory {
      */
     public TaskType createTaskType() {
         return new TaskType();
-    }
-
-    /**
-     * Create an instance of {@link InstructionType }
-     * 
-     */
-    public InstructionType createInstructionType() {
-        return new InstructionType();
     }
 
     /**

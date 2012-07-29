@@ -40,6 +40,7 @@ public class OrMongoDBIterator implements OrIterator {
     @Override
     public void add(StagingfileType stagingfile) {
         stagingfile.setFileSet(fileSet);
+        stagingfile.setNa(instruction.getNa());
         log.info("Saving record " + stagingfile.getLocation());
         final TaskType task = InstructionTypeHelper.firstTask(stagingfile);
         if (task != null) {

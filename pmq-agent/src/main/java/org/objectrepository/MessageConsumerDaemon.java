@@ -39,6 +39,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
     private String identifier;
     final private static Logger log = Logger.getLogger(MessageConsumerDaemon.class);
     private boolean pause = false;
+    private boolean stop = false;
 
     private MessageConsumerDaemon() {
         timer = System.currentTimeMillis() + period;
@@ -48,12 +49,18 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
         init();
         while (keepRunning) {
+            if (isStop()) {
                 for (Queue queue : taskExecutors) {
-                    if (getPause() && queue.isTopic() || !getPause()) {
+                    keepRunning = keepRunning && (queue.getActiveCount() != 0);
+                }
+            } else {
+                for (Queue queue : taskExecutors) {
+                    if (isPause() && queue.isTopic() || !isPause()) {
                         if (queue.getActiveCount() < queue.getMaxPoolSize()) {
                             log.debug(queue.getQueueName() + " has activeCount " + queue.getActiveCount() + " / maxPoolSize " + queue.getMaxPoolSize());
                             queue.execute(mediatorInstance(queue));
                         }
+                    }
                 }
             }
             heartbeat();
@@ -100,7 +107,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         long currentTime = System.currentTimeMillis();
         if (timer - currentTime < 0) {
             timer = currentTime + period;
-            if (getPause()) {
+            if (isPause()) {
                 log.info("We are in pause mode.");
             } else {
                 log.info("Actively listening to queues.");
@@ -112,8 +119,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         } catch (InterruptedException e) {
             interrupt();
         } catch (Throwable t) {
-            log.error("Cannot put thread to sleep...");
-            shutdown();
+            log.error("Cannot put thread to sleep..."); // Can we ignore this ?
         }
     }
 
@@ -236,10 +242,6 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         System.exit(0);
     }
 
-    public void shutdown() {
-        keepRunning = false;
-    }
-
     public void setContext(GenericXmlApplicationContext context) {
         this.context = context;
     }
@@ -252,11 +254,19 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         this.identifier = identifier;
     }
 
-    public boolean getPause() {
+    public boolean isPause() {
         return pause;
     }
 
     public void setPause(boolean pause) {
         this.pause = pause;
+    }
+
+    public boolean isStop() {
+        return stop;
+    }
+
+    public void setStop(boolean stop) {
+        this.stop = stop;
     }
 }

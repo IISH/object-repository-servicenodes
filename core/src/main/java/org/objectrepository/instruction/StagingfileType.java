@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *         &lt;element name="workflow" type="{http://objectrepository.org/instruction/1.0/}taskType" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="fileSet" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="na" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="action" minOccurs="0">
  *           &lt;simpleType>
  *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
@@ -52,6 +53,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "stagingfileType", namespace = "http://objectrepository.org/instruction/1.0/", propOrder = {
     "workflow",
     "fileSet",
+    "na",
     "action",
     "pid",
     "lid",
@@ -69,6 +71,8 @@ public class StagingfileType {
     protected List<TaskType> workflow;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
     protected String fileSet;
+    @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
+    protected String na;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
     protected String action;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
@@ -141,6 +145,30 @@ public class StagingfileType {
      */
     public void setFileSet(String value) {
         this.fileSet = value;
+    }
+
+    /**
+     * Gets the value of the na property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getNa() {
+        return na;
+    }
+
+    /**
+     * Sets the value of the na property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setNa(String value) {
+        this.na = value;
     }
 
     /**

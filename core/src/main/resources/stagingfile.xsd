@@ -38,6 +38,11 @@
                     <xs:documentation xml:lang="en">fileSet: system group identifier</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="xs:string" name="na" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">na: naming authority</xs:documentation>
+                </xs:annotation>
+            </xs:element>
 
             <xs:element name="action" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
