@@ -48,6 +48,7 @@ public class OrPut extends OrFilesFactory {
         } else {
             shardKey = getS() + Checksum.getMD5(getPid() + "/" + UUID.randomUUID().toString()).substring(getS().length()) + "0000000000000000"; // + String.format(longPadding, Long.toHexString(0)).replace(' ', '0');
         }
+        System.out.println("shardKey=" + shardKey);
 
         final BasicDBObject query = new BasicDBObject("metadata.pid", getPid());
         final GridFSDBFile document = getGridFS().findOne(query);
