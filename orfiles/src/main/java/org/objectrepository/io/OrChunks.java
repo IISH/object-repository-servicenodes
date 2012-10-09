@@ -12,7 +12,7 @@ import java.io.IOException;
  * OrChunks
  * <p/>
  * Retrieves the first two, five middle and last two chunks. Nine in total.
- * If the total is larger than the length of the file, we will skip this and return the entire filw..
+ * If the total is larger than the length of the file, we will skip this and return the entire file.
  */
 public class OrChunks extends OrFilesFactory {
 

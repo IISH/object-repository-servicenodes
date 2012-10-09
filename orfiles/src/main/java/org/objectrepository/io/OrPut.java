@@ -20,7 +20,6 @@ import java.util.UUID;
  */
 public class OrPut extends OrFilesFactory {
 
-    //private static String longPadding = "%" + String.valueOf((int) Math.sqrt(Long.SIZE) * 2) + "s";
     private String environment;
 
     /**
@@ -39,27 +38,33 @@ public class OrPut extends OrFilesFactory {
         if (fileLength == 0) {
             throw new OrFilesException("Staging file not found; or the length of the file was zero bytes.");
         }
-
-        // Legacy issue: the old shardkey was a string. Databases still use it// .
-        final Object shardKey;
-        final String shardkeyDatatype = System.getProperty("shardkeyDatatype", "string");
-        if (shardkeyDatatype.equalsIgnoreCase("int")) {
-            shardKey = new Random().nextInt(); // 32-bit random number
-        } else {
-            shardKey = getS() + Checksum.getMD5(getPid() + "/" + UUID.randomUUID().toString()).substring(getS().length()) + "0000000000000000"; // + String.format(longPadding, Long.toHexString(0)).replace(' ', '0');
-        }
-        System.out.println("shardKey=" + shardKey);
+        final Object shardKey = shardkey();
 
         final BasicDBObject query = new BasicDBObject("metadata.pid", getPid());
         final GridFSDBFile document = getGridFS().findOne(query);
         if (document != null && document.getLength() == fileLength && Checksum.compare(document.getMD5(), getMd5())) {
             System.out.println("Skip put, as the file with md5 " + getMd5() + " and length " + fileLength + " already exists.");
         } else {
-            System.out.println("Adding file.");
+            System.out.println("Adding file with shardkey " + shardKey);
             final Date start = new Date();
             addFile(localFile, shardKey);
             System.out.println("Time it took in seconds: " + (new Date().getTime() - start.getTime()) / 1000);
         }
+    }
+
+    private Object shardkey() {
+
+        final Object _id;
+        final String shardkeyDatatype = System.getProperty("shardkeyDatatype", "int");
+        if (shardkeyDatatype.equalsIgnoreCase("string")) {// Legacy issue: the old shardkey was a string. Databases still use it// .
+            _id = getS() + Checksum.getMD5(getPid() + "/" + UUID.randomUUID().toString()).substring(getS().length()) + "0000000000000000"; // + String.format(longPadding, Long.toHexString(0)).replace(' ', '0');
+        } else {
+            _id = new Random().nextInt(); // 32-bit random number
+        }
+
+        // should the key already exist we try another.
+        if (getGridFS().findOne(new BasicDBObject("_id", _id)) != null) return shardkey();
+        return _id;
     }
 
     /**
