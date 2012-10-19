@@ -69,7 +69,8 @@ public class PidHttpClient {
             statusCode = httpClient.executeMethod(method);
             body = method.getResponseBody();
         } catch (IOException e) {
-            log.warn(e);
+            log.fatal(e);
+            System.exit(-1);
         } finally {
             method.releaseConnection();
         }
@@ -86,7 +87,8 @@ public class PidHttpClient {
         try {
             pid = getPid(body);
         } catch (Exception e) {
-            log.error(e);
+            log.fatal(e);
+            System.exit(-1);
         }
         return pid;
     }
