@@ -25,7 +25,7 @@ import java.io.*;
  * Utility for importing large OR instructions. The class implements a streamer and imports the data
  * stagingfile-by-stagingfile into a bag.
  * <p/>
- * We assume the XML has at least one -or element
+ * We assume the XML has at least one instruction element
  * And this -or element may have stagingfile elements.
  * <p/>
  * The global settings will persisted

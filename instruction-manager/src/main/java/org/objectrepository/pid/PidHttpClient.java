@@ -27,8 +27,8 @@ import java.net.URL;
  */
 public class PidHttpClient {
 
-    String or_endpoint;
-    String or_key;
+    String pidwebserviceEndpoint;
+    String pidwebserviceKey;
     Transformer transformer;
     HttpClient httpClient;
 
@@ -52,8 +52,8 @@ public class PidHttpClient {
      */
     public String getPid(String cp_endpoint, String cp_key, String na, String localIdentifier, String resolveUrl) {
 
-        String key = (Normalizers.isEmpty(cp_key)) ? or_key : cp_key;
-        String endpoint = (Normalizers.isEmpty(cp_endpoint)) ? or_endpoint : cp_endpoint;
+        String key = (Normalizers.isEmpty(cp_key)) ? pidwebserviceKey : cp_key;
+        String endpoint = (Normalizers.isEmpty(cp_endpoint)) ? pidwebserviceEndpoint : cp_endpoint;
         final RequestEntity entity = new ByteArrayRequestEntity(soapenv(na, localIdentifier, resolveUrl), "text/xml; charset=utf-8");
         final PostMethod method = new PostMethod(endpoint);
         method.setRequestHeader("Authorization", "oauth " + key);
@@ -69,8 +69,7 @@ public class PidHttpClient {
             statusCode = httpClient.executeMethod(method);
             body = method.getResponseBody();
         } catch (IOException e) {
-            log.fatal(e);
-            System.exit(-1);
+            log.warn(e);
         } finally {
             method.releaseConnection();
         }
@@ -87,8 +86,7 @@ public class PidHttpClient {
         try {
             pid = getPid(body);
         } catch (Exception e) {
-            log.fatal(e);
-            System.exit(-1);
+            log.warn(e);
         }
         return pid;
     }
@@ -114,12 +112,26 @@ public class PidHttpClient {
         return new String(baos.toByteArray());
     }
 
-    public void setEndpoint(String endpoint) {
-        this.or_endpoint = endpoint;
+    /**
+     * setPidwebserviceEndpoint
+     *
+     * Setter for the endpoint. Taken from the properties file unless overwritten by -DpidwebserviceEndpoint
+     *
+     * @param pidwebserviceEndpoint
+     */
+    public void setPidwebserviceEndpoint(String pidwebserviceEndpoint) {
+        this.pidwebserviceEndpoint = System.getProperty("pidwebserviceEndpoint", pidwebserviceEndpoint);
     }
 
-    public void setKey(String key) {
-        this.or_key = key;
+    /**
+     * setPidwebserviceKey
+     *
+     * Setter for the webservice key. Taken from the properties file unless overwritten by -DpidwebserviceKey
+     *
+     * @param pidwebserviceKey
+     */
+    public void setPidwebserviceKey(String pidwebserviceKey) {
+        this.pidwebserviceKey = System.getProperty("pidwebserviceKey", pidwebserviceKey);
     }
 
     private static Logger log = Logger.getLogger(PidHttpClient.class);

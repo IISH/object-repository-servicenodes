@@ -46,8 +46,8 @@
     </bean>
 
     <bean class="org.objectrepository.pid.PidHttpClient">
-        <property name="endpoint" value="#{clientProperties['pidwebservice.endpoint']}"/>
-        <property name="key" value="#{clientProperties['pidwebservice.wskey']}"/>
+        <property name="pidwebserviceEndpoint" value="#{clientProperties['pidwebservice.endpoint']}"/>
+        <property name="pidwebserviceKey" value="#{clientProperties['pidwebservice.wskey']}"/>
     </bean>
 
 </beans>
