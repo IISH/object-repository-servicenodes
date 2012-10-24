@@ -58,7 +58,7 @@ final class InstructionUploadService extends ServiceBaseImp {
             if (xsr.getEventType() == XMLStreamReader.START_ELEMENT) {
                 String elementName = xsr.getLocalName();
                 if ("instruction".equals(elementName) && iterator == null) {
-                    // We ignore any settings in the instruction attributes as all comes from the workflow controller
+                    // We ignore any settings in the instruction attributes as all comes from the workflow controller \ database
                     iterator = dao.create(mainInstructionType);
                     xsr.next();
                 } else if (iterator != null && ("stagingfile".equals(elementName))) {

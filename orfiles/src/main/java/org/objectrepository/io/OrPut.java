@@ -10,7 +10,6 @@ import org.objectrepository.util.Checksum;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -54,16 +53,13 @@ public class OrPut extends OrFilesFactory {
 
     private Object shardkey() {
 
-        final Object _id;
-        final String shardkeyDatatype = System.getProperty("shardkeyDatatype", "int");
-        if (shardkeyDatatype.equalsIgnoreCase("string")) {// Legacy issue: the old shardkey was a string. Databases still use it// .
-            _id = getS() + Checksum.getMD5(getPid() + "/" + UUID.randomUUID().toString()).substring(getS().length()) + "0000000000000000"; // + String.format(longPadding, Long.toHexString(0)).replace(' ', '0');
-        } else {
-            _id = new Random().nextInt(); // 32-bit random number
-        }
+        final int _id = getS();
 
         // should the key already exist we try another.
-        if (getGridFS().findOne(new BasicDBObject("_id", _id)) != null) return shardkey();
+        if (getGridFS().findOne(new BasicDBObject("_id", _id)) != null) {
+            setS(null);
+            return shardkey();
+        }
         return _id;
     }
 

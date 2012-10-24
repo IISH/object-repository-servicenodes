@@ -11,6 +11,7 @@ import org.objectrepository.util.Checksum;
 
 import java.io.File;
 import java.net.URL;
+import java.util.UUID;
 
 public class OrFilesTest {
 
@@ -46,7 +47,7 @@ public class OrFilesTest {
         Assert.assertFalse("Unit test should really not contain a stagingfile until the action is called to download it from the database.", downLoadFile.exists());
 
         final String md5 = Checksum.getMD5(f);
-        add(md5, bucket, url, null);
+        add(md5, bucket, url, null, null);
 
         OrGet getFile = new OrGet();
         getFile.setMongo(hosts);
@@ -62,7 +63,7 @@ public class OrFilesTest {
         downLoadFile.delete();
     }
 
-    private void add(String pid, String bucket, URL url, String md5) throws OrFilesException {
+    private void add(String pid, String bucket, URL url, String md5, String shardKey) throws OrFilesException {
 
         if (url == null) url = getClass().getResource(file);
         final OrPut putFile = new OrPut();
@@ -73,8 +74,8 @@ public class OrFilesTest {
         putFile.setM(md5);
         putFile.setL(url.getFile());
         putFile.setA(pid);
+        putFile.setS(shardKey);
         putFile.setEnvironment("test");
-        putFile.setS("00");
         putFile.action();
     }
 
@@ -84,11 +85,11 @@ public class OrFilesTest {
         final File f = new File(url.getFile());
 
         final String pid = Checksum.getMD5(f);
-        add(pid, bucket, url, null);
+        add(pid, bucket, url, null, null);
 
         final String md5Liar = "000000000000FF";
         try {
-            add(pid, bucket, url, md5Liar);
+            add(pid, bucket, url, md5Liar, null);
         } catch (OrFilesException e) {
             Assert.assertTrue("Test threw the wrong exception: " + e.getMessage() + ". Should be complaining about the md5 mismatch.", e.getMessage().contains(md5Liar));
         }
@@ -102,8 +103,8 @@ public class OrFilesTest {
         final File f = new File(url.getFile());
         final String pid = Checksum.getMD5(f);
 
-        add(pid, bucket, url, null);
-        add(pid, bucket, urlUpdate, null);
+        add(pid, bucket, url, null, null);
+        add(pid, bucket, urlUpdate, null, null);
 
         final OrPut putFile = new OrPut();
         putFile.setMongo(hosts);
@@ -113,6 +114,34 @@ public class OrFilesTest {
         final GridFSDBFile document = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", pid));
         Assert.assertNotNull(document);
         Assert.assertEquals(document.getMetaData().get("pid"), pid);
+    }
+
+    @Test
+    public void customShardkey() throws OrFilesException {
+
+        final URL url = getClass().getResource(file);
+        final URL urlUpdate = getClass().getResource(fileUpdate);
+        final File f = new File(url.getFile());
+
+        final String pid1 = UUID.randomUUID().toString();
+        final String pid2 = UUID.randomUUID().toString();
+
+        add(pid1, bucket, url, null, "123");
+        add(pid2, bucket, urlUpdate, null, "123");
+
+        final OrPut putFile = new OrPut();
+        putFile.setMongo(hosts);
+        putFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
+        putFile.setD(db);// database
+        putFile.setB(bucket);
+
+        final GridFSDBFile document1 = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", pid1));
+        Assert.assertTrue((Integer) document1.get("_id") == 123);
+
+        final GridFSDBFile document2 = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", pid2));
+        Assert.assertTrue((Integer) document2.get("_id") != 123);
+
+
     }
 
     @Test
@@ -129,10 +158,10 @@ public class OrFilesTest {
         putFile.setD(db);// database
         putFile.setB(bucket);
 
-        add(pid, bucket, url, null);
+        add(pid, bucket, url, null, null);
         for (int i = 0; i < 10; i++) {
             final String p = pid + "." + i;
-            add(p, bucket, urlUpdate, null);
+            add(p, bucket, urlUpdate, null, null);
         }
 
         for (int i = 0; i < 10; i++) {

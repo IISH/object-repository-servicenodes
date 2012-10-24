@@ -12,6 +12,7 @@ import org.objectrepository.util.Checksum;
 import org.objectrepository.utils.Invocations;
 
 import java.io.File;
+import java.util.Random;
 
 /**
  * OrFilesFactory
@@ -43,7 +44,7 @@ public abstract class OrFilesFactory implements OrFiles {
     private String q;
     private String t;
     private String a;
-    private String s;
+    private String shardKey;
 
     public Mongo getMongo() {
         return mongo;
@@ -156,13 +157,16 @@ public abstract class OrFilesFactory implements OrFiles {
         return collection;
     }
 
-    public void setS(String s) {
-        this.s = s;
+    /**
+     * Set a preferred shard key. In this case we only allow for a Integer
+     * @param shardKey
+     */
+    public void setS(String shardKey) {
+        this.shardKey = shardKey;
     }
 
-    public String getS() {
-        if (s == null || s.startsWith("{")) s = "";
-        return s;
+    public int getS() {
+        return ( shardKey == null || shardKey.isEmpty() ) ? new Random().nextInt() : Integer.parseInt(shardKey) ;
     }
 
     public String getPid() {
