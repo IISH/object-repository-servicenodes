@@ -69,7 +69,8 @@ public class PidHttpClient {
             statusCode = httpClient.executeMethod(method);
             body = method.getResponseBody();
         } catch (IOException e) {
-            log.warn(e);
+            log.fatal(e);
+            System.exit(-1);
         } finally {
             method.releaseConnection();
         }
@@ -86,7 +87,8 @@ public class PidHttpClient {
         try {
             pid = getPid(body);
         } catch (Exception e) {
-            log.warn(e);
+            log.fatal(e);
+            System.exit(-1);
         }
         return pid;
     }
@@ -114,7 +116,7 @@ public class PidHttpClient {
 
     /**
      * setPidwebserviceEndpoint
-     *
+     * <p/>
      * Setter for the endpoint. Taken from the properties file unless overwritten by -DpidwebserviceEndpoint
      *
      * @param pidwebserviceEndpoint
@@ -125,7 +127,7 @@ public class PidHttpClient {
 
     /**
      * setPidwebserviceKey
-     *
+     * <p/>
      * Setter for the webservice key. Taken from the properties file unless overwritten by -DpidwebserviceKey
      *
      * @param pidwebserviceKey
