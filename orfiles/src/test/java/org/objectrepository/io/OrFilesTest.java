@@ -24,6 +24,7 @@ public class OrFilesTest {
     @BeforeClass
     public static void setUp() throws ClassNotFoundException {
 
+        System.setProperty("WriteConcern", "SAFE") ; // In case we do not test in a replicaset context
         final OrPut putFile = new OrPut();
         putFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
         putFile.setMongo(hosts);

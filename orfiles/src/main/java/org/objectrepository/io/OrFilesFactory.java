@@ -56,7 +56,7 @@ public abstract class OrFilesFactory implements OrFiles {
 
     public void setMongo(String[] hosts) {
         mongo = MongoDBSingleton.newInstance(hosts);
-        mongo.setWriteConcern(WriteConcern.MAJORITY);
+        mongo.setWriteConcern(WriteConcern.valueOf(System.getProperty("WriteConcern", "MAJORITY")));
     }
 
     public DBCollection getCollection() {
@@ -159,6 +159,7 @@ public abstract class OrFilesFactory implements OrFiles {
 
     /**
      * Set a preferred shard key. In this case we only allow for a Integer
+     *
      * @param shardKey
      */
     public void setS(String shardKey) {
@@ -166,7 +167,7 @@ public abstract class OrFilesFactory implements OrFiles {
     }
 
     public int getS() {
-        return ( shardKey == null || shardKey.isEmpty() ) ? new Random().nextInt() : Integer.parseInt(shardKey) ;
+        return (shardKey == null || shardKey.isEmpty()) ? new Random().nextInt() : Integer.parseInt(shardKey);
     }
 
     public String getPid() {
