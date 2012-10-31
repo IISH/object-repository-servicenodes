@@ -91,7 +91,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
         if (queue.isTopic()) {
             log.info("Adding topic consumer for " + queue.getQueueName());
-            return new MediatorTopic(this, context.getBean(ConsumerTemplate.class),context.getBean(ProducerTemplate.class), "activemq:topic:" + queue.getQueueName());
+            return new MediatorTopic(this, context.getBean(ConsumerTemplate.class), context.getBean(ProducerTemplate.class), "activemq:topic:" + queue.getQueueName());
         } else {
             log.info("Adding queue consumer for " + queue.getQueueName());
             return new MediatorQueue(context.getBean(MongoTemplate.class), context.getBean(ConsumerTemplate.class), context.getBean(ProducerTemplate.class), "activemq:" + queue.getQueueName(), queue.getShellScript(), period);
@@ -177,7 +177,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 for (int i = 0; i < argv.length; i += 2) {
                     try {
                         properties.put(argv[i], argv[i + 1]);
-                        log.info("Adding argument: " + argv[i] + "=" + argv[i + 1]);
+                        log.info("Adding argument: '" + argv[i] + "'='" + argv[i + 1] + "'");
                     } catch (ArrayIndexOutOfBoundsException arr) {
                         System.out.println("Missing value after parameter " + argv[i]);
                         System.exit(-1);
@@ -196,12 +196,12 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
             final File messageQueues = new File((String) properties.get("-messageQueues"));
             if (!messageQueues.exists()) {
-                log.fatal("Expected case sensitive parameter: -messageQueues");
+                log.fatal("Cannot find folder for messageQueues: " + messageQueues.getAbsolutePath());
                 System.exit(-1);
             }
 
             if (messageQueues.isFile()) {
-                log.fatal("-messageQueues should point to a folder, not a file.");
+                log.fatal("-messageQueues should point to a folder, not a file: " + messageQueues.getAbsolutePath());
                 System.exit(-1);
             }
 
