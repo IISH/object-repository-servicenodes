@@ -56,7 +56,7 @@ public abstract class OrFilesFactory implements OrFiles {
 
     public void setMongo(String[] hosts) {
         mongo = MongoDBSingleton.newInstance(hosts);
-        mongo.setWriteConcern(WriteConcern.valueOf(System.getProperty("WriteConcern", "MAJORITY")));
+        mongo.setWriteConcern(WriteConcern.valueOf(System.getProperty("WriteConcern", "JOURNAL_SAFE")));
     }
 
     public DBCollection getCollection() {
