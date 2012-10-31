@@ -184,7 +184,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 }
             } else {
                 log.fatal("Usage: pmq-agent.jar -messageQueues queues\n" +
-                        "The queues is a folder that contains symbolic links to the startup.sh scripts.");
+                        "The queues is a folder that contains symbolic links to the startup scripts.");
                 System.exit(-1);
             }
 
@@ -224,17 +224,21 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 final String name = file.getName();
                 final String[] split = name.split("\\.", 2);
                 final String queueName = split[0];
-                final String shellScript = file.getAbsolutePath() + "/startup.sh";
-                final int maxTask = (split.length == 1) ? 1 : Integer.parseInt(split[1]);
-                log.info("Candidate mq client for " + queueName + " maxTasks " + maxTask);
-                if (new File(shellScript).exists()) {
-                    final Queue queue = new Queue(queueName, shellScript, false);
-                    queue.setCorePoolSize(1);
-                    queue.setMaxPoolSize(maxTask);
-                    queue.setQueueCapacity(1);
-                    queues.add(queue);
-                } else {
-                    log.warn("... skipping, because no startup script found at " + shellScript);
+                final String[] scriptNames = new String[]{"/startup.sh", "\\startup.bat"};
+                for (String scriptName : scriptNames) {
+                    final String shellScript = file.getAbsolutePath() + scriptName;
+                    final int maxTask = (split.length == 1) ? 1 : Integer.parseInt(split[1]);
+                    log.info("Candidate mq client for " + queueName + " maxTasks " + maxTask);
+                    if (new File(shellScript).exists()) {
+                        final Queue queue = new Queue(queueName, shellScript, false);
+                        queue.setCorePoolSize(1);
+                        queue.setMaxPoolSize(maxTask);
+                        queue.setQueueCapacity(1);
+                        queues.add(queue);
+                        break;
+                    } else {
+                        log.warn("... skipping, because no startup script found at " + shellScript);
+                    }
                 }
             }
 
