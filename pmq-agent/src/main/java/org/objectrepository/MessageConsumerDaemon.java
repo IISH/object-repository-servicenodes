@@ -177,7 +177,6 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 for (int i = 0; i < argv.length; i += 2) {
                     try {
                         properties.put(argv[i], argv[i + 1]);
-                        log.info("Adding argument: '" + argv[i] + "'='" + argv[i + 1] + "'");
                     } catch (ArrayIndexOutOfBoundsException arr) {
                         System.out.println("Missing value after parameter " + argv[i]);
                         System.exit(-1);
@@ -187,6 +186,13 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 log.fatal("Usage: pmq-agent.jar -messageQueues queues\n" +
                         "The queues is a folder that contains symbolic links to the startup.sh scripts.");
                 System.exit(-1);
+            }
+
+            if (log.isInfoEnabled()) {
+                log.info("Arguments set: ");
+                for (String key : properties.stringPropertyNames()) {
+                    log.info("'" + key + "'='" + properties.getProperty(key) + "'");
+                }
             }
 
             if (!properties.containsKey("-messageQueues")) {
