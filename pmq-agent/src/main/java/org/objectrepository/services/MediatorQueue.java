@@ -3,6 +3,7 @@ package org.objectrepository.services;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.apache.camel.ConsumerTemplate;
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.exec.*;
 import org.apache.log4j.Logger;
 import org.objectrepository.instruction.InstructionType;
@@ -34,10 +35,12 @@ public class MediatorQueue implements Runnable {
     private String messageQueue;
     private String shellScript;
     private long period;
+    private ProducerTemplate producer;
 
-    public MediatorQueue(MongoTemplate mongoTemplate, ConsumerTemplate consumer, String messageQueue, String shellScript, long period) {
+    public MediatorQueue(MongoTemplate mongoTemplate, ConsumerTemplate consumer, ProducerTemplate producer, String messageQueue, String shellScript, long period) {
         this.mongoTemplate = mongoTemplate;
         this.consumer = consumer;
+        this.producer = producer;
         this.messageQueue = messageQueue;
         this.shellScript = shellScript;
         this.period = period;
@@ -96,6 +99,7 @@ public class MediatorQueue implements Runnable {
         } catch (Exception e) {
             timer.cancel();
             HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskError, e.getMessage(), identifier, -1);
+            producer.sendBody(identifier);
             log.info(e.getMessage());
             return;
         }
@@ -107,6 +111,7 @@ public class MediatorQueue implements Runnable {
             failure = false;
         } catch (InterruptedException e) {
             HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskError, e.getMessage(), identifier, -1);
+            producer.sendBody(identifier);
             log.error(e.getMessage());
         } finally {
             Thread.interrupted();
@@ -119,5 +124,6 @@ public class MediatorQueue implements Runnable {
         log.info("resultHandler.exitValue=" + resultHandler.getExitValue());
         log.info("resultHandler.stdout=" + s);
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskComplete, info, identifier, resultHandler.getExitValue());
+        producer.sendBody(identifier);
     }
 }

@@ -16,6 +16,7 @@
 package org.objectrepository;
 
 import org.apache.camel.ConsumerTemplate;
+import org.apache.camel.ProducerTemplate;
 import org.apache.log4j.Logger;
 import org.objectrepository.services.MediatorQueue;
 import org.objectrepository.services.MediatorTopic;
@@ -90,10 +91,10 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
         if (queue.isTopic()) {
             log.info("Adding topic consumer for " + queue.getQueueName());
-            return new MediatorTopic(this, context.getBean(ConsumerTemplate.class), "activemq:topic:" + queue.getQueueName());
+            return new MediatorTopic(this, context.getBean(ConsumerTemplate.class),context.getBean(ProducerTemplate.class), "activemq:topic:" + queue.getQueueName());
         } else {
             log.info("Adding queue consumer for " + queue.getQueueName());
-            return new MediatorQueue(context.getBean(MongoTemplate.class), context.getBean(ConsumerTemplate.class), "activemq:" + queue.getQueueName(), queue.getShellScript(), period);
+            return new MediatorQueue(context.getBean(MongoTemplate.class), context.getBean(ConsumerTemplate.class), context.getBean(ProducerTemplate.class), "activemq:" + queue.getQueueName(), queue.getShellScript(), period);
         }
     }
 

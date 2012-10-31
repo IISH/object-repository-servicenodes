@@ -49,6 +49,7 @@
 
     <camel:camelContext>
         <camel:consumerTemplate id="consumer"/>
+        <camel:template id="producer" defaultEndpoint="activemq:status"/>
     </camel:camelContext>
 
 </beans>
