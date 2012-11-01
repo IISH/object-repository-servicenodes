@@ -35,12 +35,12 @@ public class MediatorQueue implements Runnable {
     private String messageQueue;
     private String shellScript;
     private long period;
-    //private ProducerTemplate producer;
+    private ProducerTemplate producer;
 
     public MediatorQueue(MongoTemplate mongoTemplate, ConsumerTemplate consumer, ProducerTemplate producer, String messageQueue, String shellScript, long period) {
         this.mongoTemplate = mongoTemplate;
         this.consumer = consumer;
-        //this.producer = producer;
+        this.producer = producer;
         this.messageQueue = messageQueue;
         this.shellScript = shellScript;
         this.period = period;
@@ -99,7 +99,7 @@ public class MediatorQueue implements Runnable {
         } catch (Exception e) {
             timer.cancel();
             HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskError, e.getMessage(), identifier, -1);
-            //producer.sendBody(identifier);
+            producer.sendBody(identifier);
             log.info(e.getMessage());
             return;
         }
@@ -111,7 +111,7 @@ public class MediatorQueue implements Runnable {
             failure = false;
         } catch (InterruptedException e) {
             HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskError, e.getMessage(), identifier, -1);
-            //producer.sendBody(identifier);
+            producer.sendBody(identifier);
             log.error(e.getMessage());
         } finally {
             Thread.interrupted();
@@ -124,6 +124,6 @@ public class MediatorQueue implements Runnable {
         log.info("resultHandler.exitValue=" + resultHandler.getExitValue());
         log.info("resultHandler.stdout=" + s);
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskComplete, info, identifier, resultHandler.getExitValue());
-        //producer.sendBody(identifier);
+        producer.sendBody(identifier);
     }
 }

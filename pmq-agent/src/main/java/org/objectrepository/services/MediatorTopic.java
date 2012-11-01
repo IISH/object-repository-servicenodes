@@ -1,7 +1,6 @@
 package org.objectrepository.services;
 
 import org.apache.camel.ConsumerTemplate;
-import org.apache.camel.ProducerTemplate;
 import org.apache.log4j.Logger;
 import org.objectrepository.MessageConsumerDaemon;
 
@@ -10,11 +9,9 @@ public class MediatorTopic implements Runnable {
     private ConsumerTemplate consumer;
     private String messageQueue;
     MessageConsumerDaemon messageConsumerDaemon;
-    //private ProducerTemplate producer;
 
-    public MediatorTopic(MessageConsumerDaemon messageConsumerDaemon, ConsumerTemplate consumer, ProducerTemplate producer, String messageQueue) {
+    public MediatorTopic(MessageConsumerDaemon messageConsumerDaemon, ConsumerTemplate consumer, String messageQueue) {
         this.consumer = consumer;
-        //this.producer = producer;
         this.messageQueue = messageQueue;
         this.messageConsumerDaemon = messageConsumerDaemon;
     }
