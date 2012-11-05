@@ -39,7 +39,7 @@ public final class InstructionManager {
     private InstructionDao dao;
 
     @Autowired
-    ObjectFactory objectFactory;
+    private ObjectFactory objectFactory;
 
     private static Logger log = Logger.getLogger(InstructionManager.class);
 

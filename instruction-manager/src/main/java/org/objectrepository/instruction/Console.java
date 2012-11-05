@@ -49,6 +49,7 @@ public final class Console {
         }
 
         start(instructionType);
+        System.exit(0);
     }
 
     public static void start(InstructionType instructionType) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {

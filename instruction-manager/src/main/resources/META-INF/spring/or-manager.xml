@@ -16,14 +16,15 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:camel="http://camel.apache.org/schema/spring"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation=" http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+       xsi:schemaLocation="http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
     <import resource="classpath:META-INF/spring/application-context.xml"/>
     <bean id="validateService" class="org.objectrepository.instruction.InstructionValidateService"/>
     <bean id="autocreateService" class="org.objectrepository.instruction.InstructionAutocreateService"/>
-    <bean id="producer" class="org.objectrepository.instruction.InstructionManager">
+    <bean class="org.objectrepository.instruction.InstructionManager">
         <property name="instructionAutocreate" ref="autocreateService"/>
         <property name="instructionValidate" ref="validateService"/>
         <property name="instructionUpload">
@@ -49,5 +50,12 @@
         <property name="pidwebserviceEndpoint" value="#{clientProperties['pidwebservice.endpoint']}"/>
         <property name="pidwebserviceKey" value="#{clientProperties['pidwebservice.wskey']}"/>
     </bean>
+
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="brokerURL" value="#{clientProperties['grails.plugin.routing.jms.brokerURL']}"/>
+    </bean>
+    <camel:camelContext>
+        <camel:template id="producer" defaultEndpoint="activemq:status"/>
+    </camel:camelContext>
 
 </beans>

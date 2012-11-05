@@ -16,6 +16,7 @@
 
 package org.objectrepository.instruction;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.log4j.Logger;
 import org.objectrepository.instruction.dao.OrIterator;
 import org.objectrepository.instruction.dao.ServiceBase;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 /**
  * InstructionIngestService
@@ -36,7 +38,10 @@ public final class InstructionIngestService implements ServiceBase {
     InstructionValidateService instructionValidate;
 
     @Autowired
-    public ObjectFactory objectFactory;
+    ObjectFactory objectFactory;
+
+    @Autowired
+    ProducerTemplate producer;
 
     /**
      * build
@@ -62,12 +67,20 @@ public final class InstructionIngestService implements ServiceBase {
                 task.setAttempts(1);
                 task.setLimit(3);
                 task.setExitValue(Integer.MAX_VALUE);
+                task.setIdentifier(UUID.randomUUID().toString());
                 InstructionTypeHelper.setSingleTask(stagingfileType, task);
                 instruction.add(stagingfileType);
+                producer.sendBody(task.getIdentifier());
             } else {
                 log.warn("Invalid document " + stagingfileType.getLocation());
                 return;
             }
+        }
+
+        try {
+            producer.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
