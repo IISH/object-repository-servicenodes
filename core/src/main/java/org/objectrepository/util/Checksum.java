@@ -216,18 +216,18 @@ public class Checksum {
     }
 
     /**
-     * Used for testing
+     * Return the checksum
      *
      * @param args
      */
     public static void main(String[] args) throws IOException {
 
-        File folder = new File(args[0]);
-        for (File file : folder.listFiles()) {
-            Date start = new Date();
-            final String md5 = getMD5(file);
-            long time = (new Date().getTime() - start.getTime());
-            System.out.println(md5 + "\t" + String.valueOf(time / 1000));
+        final File file = new File(args[0]);
+        final String md5 = getMD5(file);
+        if (args.length == 1) {
+            System.out.print(md5 + "  " + file.getAbsolutePath());
+        } else {
+            System.out.print(md5);
         }
     }
 }

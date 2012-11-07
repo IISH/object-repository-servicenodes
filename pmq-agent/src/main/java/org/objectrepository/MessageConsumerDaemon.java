@@ -219,12 +219,14 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             }
 
             final File[] files = messageQueues.listFiles();
+            final String[] scriptNames = (properties.containsKey("-startup"))
+                    ? new String[]{properties.getProperty("-startup")}
+                    : new String[]{"/startup.sh", "\\startup.bat"};
             final List<Queue> queues = new ArrayList<Queue>();
             for (File file : files) {
                 final String name = file.getName();
                 final String[] split = name.split("\\.", 2);
                 final String queueName = split[0];
-                final String[] scriptNames = new String[]{"/startup.sh", "\\startup.bat"};
                 for (String scriptName : scriptNames) {
                     final String shellScript = file.getAbsolutePath() + scriptName;
                     final int maxTask = (split.length == 1) ? 1 : Integer.parseInt(split[1]);
