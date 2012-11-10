@@ -61,7 +61,7 @@ public final class InstructionIngestService implements ServiceBase {
                 task.setN(0);
                 task.setInfo("Starting InstructionIngest");
                 task.setName("Start");
-                task.setStatusCode(300);
+                task.setStatusCode(100);
                 task.setTotal(0);
                 task.setProcessed(0);
                 task.setAttempts(1);
