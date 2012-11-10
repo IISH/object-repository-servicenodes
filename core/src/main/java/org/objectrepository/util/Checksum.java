@@ -223,7 +223,7 @@ public class Checksum {
     public static void main(String[] args) throws IOException {
 
         final File file = new File(args[0]);
-        final String md5 = getMD5(file);
+        final String md5 = MD5.asHex(MD5.getHash(file));
         if (args.length == 1) {
             System.out.print(md5 + "  " + file.getAbsolutePath());
         } else {

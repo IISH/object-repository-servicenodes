@@ -1,6 +1,8 @@
 package org.objectrepository.io;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DBCollection;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 import org.apache.log4j.Logger;
@@ -41,7 +43,8 @@ public class OrPut extends OrFilesFactory {
 
         final BasicDBObject query = new BasicDBObject("metadata.pid", getPid());
         final GridFSDBFile document = getGridFS().findOne(query);
-        if (document != null && document.getLength() == fileLength && Checksum.compare(document.getMD5(), getMd5())) {
+        if (document != null && document.getLength() == fileLength && Checksum.compare(document.getMD5(), getMd5()) && expectedChunkCountOk(document)) {
+            // Verify the chunks
             System.out.println("Skip put, as the file with md5 " + getMd5() + " and length " + fileLength + " already exists.");
         } else {
             System.out.println("Adding file with shardkey " + shardKey);
@@ -49,6 +52,23 @@ public class OrPut extends OrFilesFactory {
             addFile(localFile, shardKey);
             System.out.println("Time it took in seconds: " + (new Date().getTime() - start.getTime()) / 1000);
         }
+    }
+
+    /**
+     * Check chunk count
+     *
+     * @param document
+     * @return
+     */
+    private boolean expectedChunkCountOk(GridFSDBFile document) {
+        final DBCollection chunkCollection = getChunkCollection();
+        final BasicDBObject field = new BasicDBObject("n", 1);
+        final int numChunks = document.numChunks();
+        for (int nc = 0; nc < numChunks; nc++) {
+            final BasicDBObjectBuilder query = BasicDBObjectBuilder.start("files_id", document.getId()).add("n", nc);
+            if (chunkCollection.findOne(query.get(), field) == null) return false;
+        }
+        return true;
     }
 
     private Object shardkey() {
@@ -93,7 +113,7 @@ public class OrPut extends OrFilesFactory {
         if (isMatch) {
             getGridFS().remove(new BasicDBObject("metadata.pid", getA()));
             final BasicDBObject update = new BasicDBObject().append("$set", new BasicDBObject().append("metadata.pid", getA()));
-            getBucket().update(new BasicDBObject("metadata.pid", semiPid), update, false, true);
+            getFilesCollection().update(new BasicDBObject("metadata.pid", semiPid), update, false, true);
         } else {
             final String message = "The md5 that was offered (" + getMd5() + ") and the md5 ingested (" + gridFile.getMD5() + ") do not match ! The file will ne removed from the database.";
             removeFile(shardKey);
