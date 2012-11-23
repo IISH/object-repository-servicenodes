@@ -39,7 +39,7 @@ public class OrPut extends OrFilesFactory {
         if (fileLength == 0) {
             throw new OrFilesException("Staging file not found; or the length of the file was zero bytes.");
         }
-        final long shardKey = shardkey();
+        final double shardKey = shardkey();
 
         final BasicDBObject query = new BasicDBObject("metadata.pid", getPid());
         final GridFSDBFile document = getGridFS().findOne(query);
@@ -79,9 +79,9 @@ public class OrPut extends OrFilesFactory {
      *
      * @return
      */
-    private long shardkey() {
+    private double shardkey() {
 
-        final long _id = getS();
+        final Double _id = getS();
         if (getGridFS().findOne(new BasicDBObject("_id", _id)) == null) return _id;
         setS(null);
         return shardkey();

@@ -127,8 +127,11 @@ public class OrFilesTest {
         final String pid1 = UUID.randomUUID().toString();
         final String pid2 = UUID.randomUUID().toString();
 
-        add(pid1, bucket, url, null, "123");
-        add(pid2, bucket, urlUpdate, null, "123");
+        final String shardKey = "9007199254740992"; // maximum floating number 2^53
+        final double _shardKey = Double.parseDouble(shardKey);
+
+        add(pid1, bucket, url, null, shardKey);
+        add(pid2, bucket, urlUpdate, null, shardKey);
 
         final OrPut putFile = new OrPut();
         putFile.setMongo(hosts);
@@ -137,10 +140,10 @@ public class OrFilesTest {
         putFile.setB(bucket);
 
         final GridFSDBFile document1 = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", pid1));
-        Assert.assertTrue((Long) document1.get("_id") == 123);
+        Assert.assertTrue((Double) document1.get("_id") == _shardKey);
 
         final GridFSDBFile document2 = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", pid2));
-        Assert.assertTrue((Long) document2.get("_id") != 123);
+        Assert.assertTrue((Double) document2.get("_id") != _shardKey);
     }
 
     @Test

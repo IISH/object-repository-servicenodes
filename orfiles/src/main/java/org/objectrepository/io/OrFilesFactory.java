@@ -170,8 +170,8 @@ public abstract class OrFilesFactory implements OrFiles {
         this.shardKey = shardKey;
     }
 
-    public long getS() {
-        return (shardKey == null || shardKey.isEmpty()) ? (long) new Random().nextInt() : Long.parseLong(shardKey);
+    public double getS() {
+        return (shardKey == null || shardKey.isEmpty()) ?  new Random().nextInt() : Double.parseDouble(shardKey);
     }
 
     public String getPid() {
