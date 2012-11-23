@@ -38,9 +38,6 @@ public final class InstructionManager {
     @Autowired
     private InstructionDao dao;
 
-    @Autowired
-    private ObjectFactory objectFactory;
-
     private static Logger log = Logger.getLogger(InstructionManager.class);
 
     private InstructionAutocreateService instructionAutocreate;

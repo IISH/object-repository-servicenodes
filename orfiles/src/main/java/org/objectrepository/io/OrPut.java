@@ -39,7 +39,7 @@ public class OrPut extends OrFilesFactory {
         if (fileLength == 0) {
             throw new OrFilesException("Staging file not found; or the length of the file was zero bytes.");
         }
-        final Object shardKey = shardkey();
+        final long shardKey = shardkey();
 
         final BasicDBObject query = new BasicDBObject("metadata.pid", getPid());
         final GridFSDBFile document = getGridFS().findOne(query);
@@ -71,16 +71,20 @@ public class OrPut extends OrFilesFactory {
         return true;
     }
 
-    private Object shardkey() {
+    /**
+     * shardkey
+     * <p/>
+     * Returns the shardKey that was delivered via console.
+     * Should the key already exist we create another.
+     *
+     * @return
+     */
+    private long shardkey() {
 
-        final int _id = getS();
-
-        // should the key already exist we try another.
-        if (getGridFS().findOne(new BasicDBObject("_id", _id)) != null) {
-            setS(null);
-            return shardkey();
-        }
-        return _id;
+        final long _id = getS();
+        if (getGridFS().findOne(new BasicDBObject("_id", _id)) == null) return _id;
+        setS(null);
+        return shardkey();
     }
 
     /**

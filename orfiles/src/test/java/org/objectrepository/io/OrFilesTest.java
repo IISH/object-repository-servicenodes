@@ -24,7 +24,7 @@ public class OrFilesTest {
     @BeforeClass
     public static void setUp() throws ClassNotFoundException {
 
-        System.setProperty("WriteConcern", "SAFE") ; // In case we do not test in a replicaset context
+        System.setProperty("WriteConcern", "SAFE"); // In case we do not test in a replicaset context
         final OrPut putFile = new OrPut();
         putFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
         putFile.setMongo(hosts);
@@ -137,12 +137,10 @@ public class OrFilesTest {
         putFile.setB(bucket);
 
         final GridFSDBFile document1 = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", pid1));
-        Assert.assertTrue((Integer) document1.get("_id") == 123);
+        Assert.assertTrue((Long) document1.get("_id") == 123);
 
         final GridFSDBFile document2 = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", pid2));
-        Assert.assertTrue((Integer) document2.get("_id") != 123);
-
-
+        Assert.assertTrue((Long) document2.get("_id") != 123);
     }
 
     @Test
