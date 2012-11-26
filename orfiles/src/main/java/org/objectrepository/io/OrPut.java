@@ -82,8 +82,9 @@ public class OrPut extends OrFilesFactory {
     private double shardkey() throws OrFilesException {
 
         final Double _id = getS();
+        if (_id == 0) throw new OrFilesException("Shardkey cannot be absent or zero.");
         if (getGridFS().findOne(new BasicDBObject("_id", _id)) == null) return _id;
-        throw new OrFilesException("The shardkey is already taken. It must be unique.") ;
+        throw new OrFilesException("The shardkey is already taken. It must be unique.");
     }
 
     /**

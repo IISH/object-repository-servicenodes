@@ -170,9 +170,7 @@ public abstract class OrFilesFactory implements OrFiles {
     }
 
     public double getS() throws OrFilesException {
-        if (shardKey == null || shardKey.isEmpty() || shardKey.equals("0") || shardKey.equals("-0")) {
-            throw new OrFilesException("Shardkey cannot be absent or zero.");
-        }
+        if (shardKey == null || shardKey.isEmpty() ) return 0;
         return Double.parseDouble(shardKey);
     }
 
