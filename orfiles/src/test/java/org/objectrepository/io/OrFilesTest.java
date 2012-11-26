@@ -11,6 +11,7 @@ import org.objectrepository.util.Checksum;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Random;
 import java.util.UUID;
 
 public class OrFilesTest {
@@ -67,6 +68,7 @@ public class OrFilesTest {
     private void add(String pid, String bucket, URL url, String md5, String shardKey) throws OrFilesException {
 
         if (url == null) url = getClass().getResource(file);
+        if (shardKey == null) shardKey = Integer.toString(new Random().nextInt());
         final OrPut putFile = new OrPut();
         putFile.setMongo(hosts);
         putFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
@@ -122,7 +124,6 @@ public class OrFilesTest {
 
         final URL url = getClass().getResource(file);
         final URL urlUpdate = getClass().getResource(fileUpdate);
-        final File f = new File(url.getFile());
 
         final String pid1 = UUID.randomUUID().toString();
         final String pid2 = UUID.randomUUID().toString();
@@ -131,19 +132,37 @@ public class OrFilesTest {
         final double _shardKey = Double.parseDouble(shardKey);
 
         add(pid1, bucket, url, null, shardKey);
-        add(pid2, bucket, urlUpdate, null, shardKey);
-
         final OrPut putFile = new OrPut();
         putFile.setMongo(hosts);
         putFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
         putFile.setD(db);// database
         putFile.setB(bucket);
-
         final GridFSDBFile document1 = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", pid1));
         Assert.assertTrue((Double) document1.get("_id") == _shardKey);
 
-        final GridFSDBFile document2 = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", pid2));
-        Assert.assertTrue((Double) document2.get("_id") != _shardKey);
+        boolean failure = false;
+        try {
+            add(pid2, bucket, urlUpdate, null, shardKey);
+        } catch (OrFilesException e) {
+            failure = true;
+        }
+        Assert.assertTrue("Cannot add an identical key. This ought to have been caught.", failure);
+
+        failure = false;
+        try {
+            add(pid2, bucket, urlUpdate, null, "0");
+        } catch (OrFilesException e) {
+            failure = true;
+        }
+        Assert.assertTrue("Cannot add a shardkey with value 0.", failure);
+
+        failure = false;
+        try {
+            add(pid2, bucket, urlUpdate, null, "-0");
+        } catch (OrFilesException e) {
+            failure = true;
+        }
+        Assert.assertTrue("Cannot add a shardkey with value 0.", failure);
     }
 
     @Test

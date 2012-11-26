@@ -47,7 +47,7 @@ public class OrPut extends OrFilesFactory {
             // Verify the chunks
             System.out.println("Skip put, as the file with md5 " + getMd5() + " and length " + fileLength + " already exists.");
         } else {
-            System.out.println("Adding file with shardkey " + shardKey);
+            System.out.println("Adding file with shardkey " + Double.toString(shardKey));
             final Date start = new Date();
             addFile(localFile, shardKey);
             System.out.println("Time it took in seconds: " + (new Date().getTime() - start.getTime()) / 1000);
@@ -79,12 +79,11 @@ public class OrPut extends OrFilesFactory {
      *
      * @return
      */
-    private double shardkey() {
+    private double shardkey() throws OrFilesException {
 
         final Double _id = getS();
         if (getGridFS().findOne(new BasicDBObject("_id", _id)) == null) return _id;
-        setS(null);
-        return shardkey();
+        throw new OrFilesException("The shardkey is already taken. It must be unique.") ;
     }
 
     /**

@@ -12,7 +12,6 @@ import org.objectrepository.util.Checksum;
 import org.objectrepository.utils.Invocations;
 
 import java.io.File;
-import java.util.Random;
 
 /**
  * OrFilesFactory
@@ -170,8 +169,11 @@ public abstract class OrFilesFactory implements OrFiles {
         this.shardKey = shardKey;
     }
 
-    public double getS() {
-        return (shardKey == null || shardKey.isEmpty()) ?  new Random().nextInt() : Double.parseDouble(shardKey);
+    public double getS() throws OrFilesException {
+        if (shardKey == null || shardKey.isEmpty() || shardKey.equals("0") || shardKey.equals("-0")) {
+            throw new OrFilesException("Shardkey cannot be absent or zero.");
+        }
+        return Double.parseDouble(shardKey);
     }
 
     public String getPid() {
