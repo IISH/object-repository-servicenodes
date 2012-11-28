@@ -50,7 +50,8 @@ public class MediatorQueue implements Runnable {
     public void run() {
 
         log.debug("Start listening to " + messageQueue);
-        String message = consumer.receiveBody(messageQueue, String.class);
+        String message = consumer.receiveBody(messageQueue, 300000, String.class);
+        if (message == null) return;
         log.debug("Message received from " + messageQueue + " : " + message);
 
         InstructionType instructionType;
