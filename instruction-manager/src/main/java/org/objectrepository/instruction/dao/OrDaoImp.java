@@ -17,7 +17,7 @@ public class OrDaoImp implements OrDao {
     @Override
     public boolean hasFiles(String na, String pid) {
         final DBObject query = new BasicDBObject("metadata.pid", pid);
-        DBObject document = mongo.getDB("or_" + na).getCollection(collection).findOne(query);
+        DBObject document = mongo.getDB("or_" + na).getCollection(collection).findOne(query, query);
         return ( document != null );
     }
 }
