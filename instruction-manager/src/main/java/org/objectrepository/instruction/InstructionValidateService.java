@@ -40,6 +40,7 @@ import java.security.NoSuchAlgorithmException;
  * The PID of an object must not exists with other objects elsewhere in the instruction.
  *
  * @author Laszlo Marossy <marossyl@ceu.hu>
+ * @author Lucien van Wouw <lwo@iisg.nl>
  */
 public final class InstructionValidateService extends ServiceBaseImp {
 
@@ -93,7 +94,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
                 if (action.equalsIgnoreCase("add")) {
                     throw new InstructionException("ExpectFileAdd");
                 }
-                if (action.equalsIgnoreCase("upsert") && !orDaoImp.hasFiles(stagingfileType.getPid())) {
+                if (action.equalsIgnoreCase("upsert") && !orDaoImp.hasFiles(instruction.getNa(), stagingfileType.getPid())) {
                     throw new InstructionException("ExpectFileUpsert");
                 }
                 return false;
@@ -176,7 +177,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
             }
 
             if (action.equalsIgnoreCase("delete")) return false;
-            final boolean hasFiles = orDaoImp.hasFiles(stagingfileType.getPid());
+            final boolean hasFiles = orDaoImp.hasFiles(instruction.getInstruction().getNa(), stagingfileType.getPid());
             if (action.equalsIgnoreCase("add") && hasFiles) {
                 throw new InstructionException("ExpectUpdate");
             }

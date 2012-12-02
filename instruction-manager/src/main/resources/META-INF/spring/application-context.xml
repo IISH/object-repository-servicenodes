@@ -52,9 +52,5 @@
         <constructor-arg name="mongo" ref="mongo"/>
         <constructor-arg name="databaseName" value="#{clientProperties['mongo.database.sa']}"/>
     </bean>
-    <bean id="mongoTemplateOr" class="org.springframework.data.mongodb.core.MongoTemplate">
-        <constructor-arg name="mongo" ref="mongo"/>
-        <constructor-arg name="databaseName" value="#{clientProperties['mongo.database.or']}"/>
-    </bean>
 
 </beans>

@@ -12,5 +12,5 @@ public interface OrDao {
      * @param pid
      * @return
      */
-    boolean hasFiles(String pid);
+    boolean hasFiles(String na, String pid);
 }
