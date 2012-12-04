@@ -88,6 +88,7 @@ public class OrInstructionTest {
     @BeforeClass
     public static void setUp() throws Exception {
 
+        System.setProperty("environment", "development");
         String tmp = TestHelperMethods.getFileSet();
         fileSet = Normalizers.normalize(tmp);
         na = System.getProperty("na");

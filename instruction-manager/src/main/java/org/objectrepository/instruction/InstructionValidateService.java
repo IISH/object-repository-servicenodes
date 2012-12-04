@@ -86,8 +86,9 @@ public final class InstructionValidateService extends ServiceBaseImp {
      */
     public boolean missing(InstructionType instruction, StagingfileType stagingfileType) {
 
+        final boolean checkMaster = Normalizers.isEmpty(instruction.getPlan()) || instruction.getPlan().contains("StagingfileIngestMaster");
         final String action = (String) InstructionTypeHelper.getValue(instruction, stagingfileType, "action");
-        if (action.equalsIgnoreCase("delete")) return false;
+        if (!checkMaster || action.equalsIgnoreCase("delete")) return false;
 
         try {
             if (stagingfileType.getLocation() == null) {
@@ -138,8 +139,9 @@ public final class InstructionValidateService extends ServiceBaseImp {
     @Override
     public void objectFromFile(File file, OrIterator instruction) {
 
+        final boolean checkMaster = Normalizers.isEmpty(instruction.getInstruction().getPlan()) || instruction.getInstruction().getPlan().contains("StagingfileIngestMaster");
         StagingfileType stagingfileType = instruction.getFileByLocation(Normalizers.toRelative(instruction.getInstruction().getFileSet(), file));
-        if (wrongFileContent(file, instruction, stagingfileType)) {
+        if (checkMaster && wrongFileContent(file, instruction, stagingfileType)) {
             instruction.add(stagingfileType);
         } else {
             if (stagingfileType.getPid() == null) {

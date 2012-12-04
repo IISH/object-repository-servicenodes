@@ -103,7 +103,7 @@ public class OrMongoDBIterator implements OrIterator {
     @Override
     public void remove() {
         final DBObject document = cursor.curr();
-        final Query query = new Query(new Criteria("_id").is(document.get("id_")));
+        final Query query = new Query(new Criteria("_id").is(document.get("_id")));
         mongoTemplate.remove(query, collectionName);
     }
 

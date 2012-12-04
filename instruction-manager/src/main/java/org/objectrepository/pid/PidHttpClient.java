@@ -70,7 +70,7 @@ public class PidHttpClient {
             body = method.getResponseBody();
         } catch (IOException e) {
             log.fatal(e);
-            System.exit(-1);
+            if (System.getProperty("environment", "production").equalsIgnoreCase("production")) System.exit(-1);
         } finally {
             method.releaseConnection();
         }
@@ -88,7 +88,7 @@ public class PidHttpClient {
             pid = getPid(body);
         } catch (Exception e) {
             log.fatal(e);
-            System.exit(-1);
+            if (System.getProperty("environment", "production").equalsIgnoreCase("production")) System.exit(-1);
         }
         return pid;
     }

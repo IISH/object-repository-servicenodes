@@ -17,12 +17,10 @@ package org.objectrepository.instruction.dao;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import org.apache.log4j.Logger;
 import org.objectrepository.instruction.InstructionType;
 import org.objectrepository.util.Checksum;
 import org.objectrepository.util.Normalizers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Update;
@@ -47,7 +45,6 @@ public class InstructionMongoDBImpl implements InstructionDao {
     private String profile;
 
     @Autowired
-    @Qualifier("mongoTemplateSa")
     private MongoTemplate mongoTemplate;
 
     @Override
@@ -135,5 +132,5 @@ public class InstructionMongoDBImpl implements InstructionDao {
         return collection + "_" + getCollectionName(na, fileSet);
     }
 
-    private static Logger log = Logger.getLogger(InstructionMongoDBImpl.class);
+    //private static Logger log = Logger.getLogger(InstructionMongoDBImpl.class);
 }
