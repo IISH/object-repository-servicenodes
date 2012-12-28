@@ -1,9 +1,6 @@
 package org.objectrepository.instruction.dao;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.WriteConcern;
+import com.mongodb.*;
 import org.apache.log4j.Logger;
 import org.objectrepository.instruction.InstructionType;
 import org.objectrepository.instruction.StagingfileType;
@@ -35,6 +32,7 @@ public class OrMongoDBIterator implements OrIterator {
         updateExpectedTotal();
         DBObject query = new BasicDBObject("fileSet", fileSet);
         cursor = mongoTemplate.getCollection(collectionName).find(query);
+        cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
     }
 
     @Override
