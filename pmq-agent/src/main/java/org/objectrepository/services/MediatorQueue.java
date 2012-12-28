@@ -121,7 +121,9 @@ public class MediatorQueue implements Runnable {
         if (failure) return;
 
         final String s = stdout.toString();
-        final String info = (resultHandler.getExitValue() == 0) ? null : "Fail: " + s;
+        String info = (resultHandler.getExitValue() == 0) ? null : "Fail: " + s;
+        if (info != null && info.length() > 1000)
+            info = "Fail (...only showing last 1000 characters of error message): " + info.substring(info.length() - 1000);
         log.info("resultHandler.exitValue=" + resultHandler.getExitValue());
         log.info("resultHandler.stdout=" + s);
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskComplete, info, identifier, resultHandler.getExitValue());
