@@ -78,6 +78,7 @@ public class MediatorQueue implements Runnable {
                     return;
                 }
                 ok = true;
+                break;
             } catch (MongoException e) {
                 log.warn(e);
                 try {
