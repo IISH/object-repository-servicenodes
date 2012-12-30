@@ -75,7 +75,7 @@ public class MediatorQueue implements Runnable {
             try {
                 if (mongoTemplate.getCollection(collectionName).findOne(query) == null) {
                     log.warn("Ignoring message because it's task(identifier=" + identifier + ") no longer not exist in the collection " + collectionName);
-                    break;
+                    return;
                 }
                 ok = true;
             } catch (MongoException e) {
@@ -153,6 +153,6 @@ public class MediatorQueue implements Runnable {
     }
 
     private void requeue(String message) {
-        producer.sendBody("activemq:" + messageQueue, message);
+        producer.sendBody(messageQueue, message);
     }
 }
