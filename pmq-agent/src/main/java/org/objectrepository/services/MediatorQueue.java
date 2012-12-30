@@ -87,7 +87,11 @@ public class MediatorQueue implements Runnable {
                 }
             }
         }
-        if (!ok) return;
+
+        if (!ok) {
+            requeue(message);
+            return;
+        }
 
         log.info("Message received: " + identifier);
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskReceipt, "Task received", identifier, 0);
@@ -148,7 +152,7 @@ public class MediatorQueue implements Runnable {
         producer.sendBody(identifier);
     }
 
-    /*private void requeue(String message) {
+    private void requeue(String message) {
         producer.sendBody("activemq:" + messageQueue, message);
-    }*/
+    }
 }
