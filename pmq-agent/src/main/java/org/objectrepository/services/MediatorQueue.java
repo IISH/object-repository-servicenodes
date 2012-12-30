@@ -2,6 +2,7 @@ package org.objectrepository.services;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.MongoException;
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.exec.*;
@@ -50,7 +51,7 @@ public class MediatorQueue implements Runnable {
     public void run() {
 
         log.debug("Start listening to " + messageQueue);
-        String message = consumer.receiveBody(messageQueue, 300000, String.class);
+        String message = consumer.receiveBody(messageQueue, String.class);
         if (message == null) return;
         log.debug("Message received from " + messageQueue + " : " + message);
 
@@ -66,9 +67,24 @@ public class MediatorQueue implements Runnable {
         final String identifier = instructionType.getWorkflow().get(0).getIdentifier();
         final DBObject query = new BasicDBObject("workflow.identifier", identifier);
         final String collectionName = Queue.getCollectionName(messageQueue);
-        if (mongoTemplate.getCollection(collectionName).findOne(query) == null) {
-            log.warn("Ignoring message because it's task(identifier=" + identifier + ") no longer not exist in the collection " + collectionName);
-            return;
+
+        // As the connection pool may have been lost because of a network issue, this query may break and the message is lost.
+        // Retry five times
+        for (int i = 0; i < 5; i++) {
+            try {
+                if (mongoTemplate.getCollection(collectionName).findOne(query) == null) {
+                    log.warn("Ignoring message because it's task(identifier=" + identifier + ") no longer not exist in the collection " + collectionName);
+                    return;
+                }
+                break; // end iteration
+            } catch (MongoException e) {
+                log.warn(e);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e1) {
+                    log.warn(e1);
+                }
+            }
         }
 
         log.info("Message received: " + identifier);
@@ -129,4 +145,8 @@ public class MediatorQueue implements Runnable {
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskComplete, info, identifier, resultHandler.getExitValue());
         producer.sendBody(identifier);
     }
+
+    /*private void requeue(String message) {
+        producer.sendBody("activemq:" + messageQueue, message);
+    }*/
 }
