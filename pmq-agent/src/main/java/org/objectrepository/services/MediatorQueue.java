@@ -70,22 +70,24 @@ public class MediatorQueue implements Runnable {
 
         // As the connection pool may have been lost because of a network issue, this query may break and the message is lost.
         // Retry five times
+        boolean ok = false;
         for (int i = 0; i < 5; i++) {
             try {
                 if (mongoTemplate.getCollection(collectionName).findOne(query) == null) {
                     log.warn("Ignoring message because it's task(identifier=" + identifier + ") no longer not exist in the collection " + collectionName);
-                    return;
+                    break;
                 }
-                break; // end iteration
+                ok = true;
             } catch (MongoException e) {
                 log.warn(e);
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e1) {
                     log.warn(e1);
                 }
             }
         }
+        if (!ok) return;
 
         log.info("Message received: " + identifier);
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskReceipt, "Task received", identifier, 0);
