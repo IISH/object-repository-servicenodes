@@ -55,7 +55,8 @@ public abstract class OrFilesFactory implements OrFiles {
 
     public void setMongo(String[] hosts) {
         mongo = MongoDBSingleton.newInstance(hosts);
-        mongo.setWriteConcern(WriteConcern.valueOf(System.getProperty("WriteConcern", "FSYNC_SAFE")));
+        mongo.setWriteConcern(WriteConcern.valueOf(System.getProperty("WriteConcern", "JOURNAL_SAFE")));
+        log.info("WriteConcern set to " + mongo.getWriteConcern().getWString());
     }
 
     public DBCollection getCollection() {
@@ -170,7 +171,7 @@ public abstract class OrFilesFactory implements OrFiles {
     }
 
     public double getS() throws OrFilesException {
-        if (shardKey == null || shardKey.isEmpty() ) return 0;
+        if (shardKey == null || shardKey.isEmpty()) return 0;
         return Double.parseDouble(shardKey);
     }
 

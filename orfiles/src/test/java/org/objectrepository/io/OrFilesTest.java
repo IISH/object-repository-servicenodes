@@ -1,6 +1,7 @@
 package org.objectrepository.io;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.WriteConcern;
 import com.mongodb.gridfs.GridFSDBFile;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -190,5 +191,17 @@ public class OrFilesTest {
             final GridFSDBFile document = putFile.getGridFS().findOne(new BasicDBObject("metadata.pid", p));
             Assert.assertNotNull(document);
         }
+    }
+
+    @Test
+    public void writeConcern() throws OrFilesException {
+        final OrPut putFileSAFE = new OrPut();
+        putFileSAFE.setMongo(hosts);
+        Assert.assertEquals(putFileSAFE.getGridFS().getDB().getMongo().getWriteConcern().getW(), WriteConcern.SAFE.getW());
+
+        System.setProperty("WriteConcern", "REPLICAS_SAFE");
+        final OrPut putFileREPLICAS_SAFE = new OrPut();
+        putFileREPLICAS_SAFE.setMongo(hosts);
+        Assert.assertEquals(putFileREPLICAS_SAFE.getGridFS().getDB().getMongo().getWriteConcern().getW(), WriteConcern.REPLICAS_SAFE.getW());
     }
 }
