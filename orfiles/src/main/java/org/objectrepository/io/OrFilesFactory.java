@@ -53,10 +53,17 @@ public abstract class OrFilesFactory implements OrFiles {
         this.mongo = mongo;
     }
 
-    public void setMongo(String[] hosts) {
+    public void setMongo(String[] hosts) throws OrFilesException {
         mongo = MongoDBSingleton.newInstance(hosts);
-        mongo.setWriteConcern(WriteConcern.valueOf(System.getProperty("WriteConcern", "JOURNAL_SAFE")));
-        log.info("WriteConcern set to " + mongo.getWriteConcern().getWString());
+        final String property = System.getProperty("WriteConcern", "JOURNAL_SAFE");
+        final WriteConcern writeConcern = WriteConcern.valueOf(property);
+        if (writeConcern == null) {
+            log.fatal("Invalid write concern setting: " + property);
+            throw new OrFilesException("Invalid write concern value " + property);
+        } else {
+            mongo.setWriteConcern(writeConcern);
+            log.info("WriteConcern set to " + mongo.getWriteConcern().getWString());
+        }
     }
 
     public DBCollection getCollection() {

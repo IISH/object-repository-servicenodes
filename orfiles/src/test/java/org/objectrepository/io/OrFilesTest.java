@@ -24,7 +24,7 @@ public class OrFilesTest {
     final static private String bucket = "level12345";
 
     @BeforeClass
-    public static void setUp() throws ClassNotFoundException {
+    public static void setUp() throws ClassNotFoundException, OrFilesException {
 
         System.setProperty("WriteConcern", "SAFE"); // In case we do not test in a replicaset context
         final OrPut putFile = new OrPut();
@@ -35,7 +35,7 @@ public class OrFilesTest {
     }
 
     @AfterClass
-    public static void tearDown() throws ClassNotFoundException {
+    public static void tearDown() throws ClassNotFoundException, OrFilesException {
 
         setUp();
     }
@@ -203,5 +203,16 @@ public class OrFilesTest {
         final OrPut putFileREPLICAS_SAFE = new OrPut();
         putFileREPLICAS_SAFE.setMongo(hosts);
         Assert.assertEquals(putFileREPLICAS_SAFE.getGridFS().getDB().getMongo().getWriteConcern().getW(), WriteConcern.REPLICAS_SAFE.getW());
+
+        System.setProperty("WriteConcern", "I DO NOT EXIST");
+        final OrPut putFileFSYNC_SAFE = new OrPut();
+
+        boolean mustHaveError = false;
+        try {
+            putFileFSYNC_SAFE.setMongo(hosts);
+        } catch (OrFilesException e) {
+            mustHaveError = true;
+        }
+        Assert.assertTrue("An invalid writeconcern setting should throw an exception.", mustHaveError);
     }
 }
