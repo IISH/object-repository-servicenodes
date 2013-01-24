@@ -12,7 +12,6 @@ import org.objectrepository.util.Checksum;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * OrPut
@@ -93,6 +92,7 @@ public class OrPut extends OrFilesFactory {
      * Adds a new stagingfile into the database.
      * <p/>
      * We will add a semiPid. Should the upload fail, we thus still possess an original master document.
+     * Should the upload process fail, we can resume this with the next chunk.
      *
      * @param localFile
      * @throws org.objectrepository.exceptions.OrFilesException
@@ -107,8 +107,10 @@ public class OrPut extends OrFilesFactory {
             throw new OrFilesException(e);
         }
 
+        final String semiPid = "_" + getA();
+        getGridFS().remove(new BasicDBObject("metadata.pid", semiPid));
+
         gridFile.setId(shardKey);
-        final String semiPid = UUID.randomUUID().toString();
         gridFile.setMetaData(new BasicDBObject("pid", semiPid));
         gridFile.setContentType(getT());
         gridFile.save();
@@ -120,16 +122,12 @@ public class OrPut extends OrFilesFactory {
             getFilesCollection().update(new BasicDBObject("metadata.pid", semiPid), update, false, true);
         } else {
             final String message = "The md5 that was offered (" + getMd5() + ") and the md5 ingested (" + gridFile.getMD5() + ") do not match ! The file will ne removed from the database.";
-            removeFile(shardKey);
+            getGridFS().remove(new BasicDBObject("_id", shardKey));
             log.fatal(message);
             if (getEnvironment().equalsIgnoreCase("production")) {
                 System.exit(230);
             } else throw new OrFilesException(message);
         }
-    }
-
-    private void removeFile(Object shardKey) {
-        getGridFS().remove(new BasicDBObject("_id", shardKey));
     }
 
     public String getEnvironment() {

@@ -53,7 +53,7 @@ public final class InstructionIngestService implements ServiceBase {
      * @throws NoSuchAlgorithmException
      */
     @Override
-    public void build(OrIterator instruction) throws IOException, NoSuchAlgorithmException {
+    public void build(OrIterator instruction) {
         while (instruction.hasNext()) {
             final StagingfileType stagingfileType = instruction.next();
             if (instructionValidate.isMarkedAsValid(stagingfileType)) {
@@ -70,7 +70,13 @@ public final class InstructionIngestService implements ServiceBase {
                 task.setIdentifier(UUID.randomUUID().toString());
                 InstructionTypeHelper.setSingleTask(stagingfileType, task);
                 instruction.add(stagingfileType);
-                producer.sendBody(task.getIdentifier());
+
+                try {
+                    producer.sendBody(task.getIdentifier());
+                } catch (Exception e) {
+                    log.warn(e);
+                }
+
             } else {
                 log.warn("Invalid document " + stagingfileType.getLocation());
                 return;
@@ -80,7 +86,7 @@ public final class InstructionIngestService implements ServiceBase {
         try {
             producer.stop();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn(e);
         }
     }
 
