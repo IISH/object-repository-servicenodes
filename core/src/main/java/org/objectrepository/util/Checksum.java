@@ -161,7 +161,7 @@ public class Checksum {
      */
     private static String nativeMd5(String md5sum, File file) throws IOException {
 
-        final String command = md5sum + " " + file.getAbsolutePath();
+        final String command = md5sum + " \"" + file.getAbsolutePath() + "\"";
         final Process process = Runtime.getRuntime().exec(command);
         return parse(process.getInputStream());
     }
