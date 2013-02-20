@@ -23,7 +23,7 @@
         targetNamespace="http://objectrepository.org/instruction/1.0/">
 
     <xs:include schemaLocation="task.xsd"/>
-    <xs:element name="stagingfile" type="tns:stagingfileType" />
+    <xs:element name="stagingfile" type="tns:stagingfileType"/>
 
     <xs:complexType name="stagingfileType">
         <xs:sequence>
@@ -61,7 +61,7 @@
             <xs:element type="xs:string" name="pid" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">pid : the persistent identifier without the resolver
-                        server Url.
+                        server Url. For example: prefix/identifier like 12345/my.file.pid
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
@@ -112,6 +112,22 @@
             <xs:element type="xs:string" name="id" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">id: system identifier</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="objid" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">objid: the METS object identifier where this file and it's
+                        derivatives will belong to. It must be a persistent identifier without the resolve URL.
+                        For example: prefix/identifier like 12345/my.file.pid
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:int" name="seq" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">seq: the physical order of this file in a collection of files.
+                        For example where the file is part of a book. When omitted the seq value will be that of the
+                        position of the file in the instruction.
+                    </xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>

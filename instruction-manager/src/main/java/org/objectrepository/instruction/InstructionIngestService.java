@@ -54,9 +54,13 @@ public final class InstructionIngestService implements ServiceBase {
      */
     @Override
     public void build(OrIterator instruction) {
+        int seq = 0;
         while (instruction.hasNext()) {
             final StagingfileType stagingfileType = instruction.next();
             if (instructionValidate.isMarkedAsValid(stagingfileType)) {
+                if (stagingfileType.getSeq() == 0) {
+                    stagingfileType.setSeq(++seq);
+                }
                 TaskType task = objectFactory.createTaskType();
                 task.setN(0);
                 task.setInfo("Starting InstructionIngest");

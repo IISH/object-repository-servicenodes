@@ -41,6 +41,8 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="access" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="version" type="{http://www.w3.org/2001/XMLSchema}long"/>
  *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="objid" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="seq" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -63,7 +65,9 @@ import javax.xml.bind.annotation.XmlType;
     "contentType",
     "access",
     "version",
-    "id"
+    "id",
+    "objid",
+    "seq"
 })
 public class StagingfileType {
 
@@ -93,6 +97,10 @@ public class StagingfileType {
     protected long version;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
     protected String id;
+    @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
+    protected String objid;
+    @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
+    protected Integer seq;
 
     /**
      * Gets the value of the workflow property.
@@ -401,6 +409,54 @@ public class StagingfileType {
      */
     public void setId(String value) {
         this.id = value;
+    }
+
+    /**
+     * Gets the value of the objid property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getObjid() {
+        return objid;
+    }
+
+    /**
+     * Sets the value of the objid property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setObjid(String value) {
+        this.objid = value;
+    }
+
+    /**
+     * Gets the value of the seq property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
+     */
+    public Integer getSeq() {
+        return seq;
+    }
+
+    /**
+     * Sets the value of the seq property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
+     */
+    public void setSeq(Integer value) {
+        this.seq = value;
     }
 
 }

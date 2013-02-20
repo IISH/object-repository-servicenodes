@@ -13,6 +13,9 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions aNnd
   ~ limitations under the License.
+
+  This file does not contain system entities. Hence it is suitable for external use for those who need a schema
+  for their instruction.
   -->
 
 <xs:schema
@@ -35,7 +38,9 @@
         <xs:attribute name="plan">
             <xs:annotation>
                 <xs:documentation xml:lang="en">plan : A list of comma separated services that are to be invoked. These
-                    are: StagingfileIngestMaster, StagingFileBindPIDs, StagingfileIngestLevel1, StagingfileIngestLevel2, StagingfileIngestLevel3</xs:documentation>
+                    are: StagingfileIngestMaster, StagingFileBindPIDs, StagingfileIngestLevel1, StagingfileIngestLevel2,
+                    StagingfileIngestLevel3
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="label">
@@ -105,6 +110,14 @@
                 <xs:documentation xml:lang="en">pidwebserviceKey : pid webservice key (36 size UUID)</xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute type="xs:string" name="objid">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">objid: the METS object identifier where this file and it's
+                    derivatives will belong to. It must be a persistent identifier without the resolve URL.
+                    For example: prefix/identifier like 12345/my.mets.pid
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="stagingfileType">
@@ -160,6 +173,22 @@
                 <xs:annotation>
                     <xs:documentation xml:lang="en">access : Indicates if the resource is available
                         to the public.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:int" name="objid" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">objid: the METS object identifier where this file and it's
+                        derivatives will belong to. It must be a persistent identifier without the resolve URL.
+                        For example: prefix/identifier like 12345/my.file.pid
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:int" name="seq" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">seq: the physical order of this file in a collection of files.
+                        For example where the file is part of a book. When omitted the seq value will be that of the
+                        position of the file in the instruction.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>

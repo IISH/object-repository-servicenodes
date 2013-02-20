@@ -44,7 +44,9 @@
         <xs:attribute name="plan">
             <xs:annotation>
                 <xs:documentation xml:lang="en">plan : A list of comma separated services that are to be invoked. These
-                    are: StagingfileIngestMaster, StagingFileBindPIDs, StagingfileIngestLevel1, StagingfileIngestLevel2, StagingfileIngestLevel3</xs:documentation>
+                    are: StagingfileIngestMaster, StagingFileBindPIDs, StagingfileIngestLevel1, StagingfileIngestLevel2,
+                    StagingfileIngestLevel3
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="fileSet">
@@ -138,6 +140,14 @@
         <xs:attribute type="xs:string" name="id">
             <xs:annotation>
                 <xs:documentation xml:lang="en">id (system): local identifier</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" name="objid">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">objid: the METS object identifier where this file and it's
+                    derivatives will belong to. It must be a persistent identifier without the resolve URL.
+                    For example: prefix/identifier like 12345/my.mets.pid
+                </xs:documentation>
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>

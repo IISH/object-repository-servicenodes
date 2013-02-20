@@ -47,6 +47,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="pidwebserviceKey" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="version" type="{http://www.w3.org/2001/XMLSchema}long" default="0" />
  *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="objid" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -101,6 +102,8 @@ public class InstructionType {
     protected Long version;
     @XmlAttribute
     protected String id;
+    @XmlAttribute
+    protected String objid;
 
     /**
      * Gets the value of the workflow property.
@@ -498,6 +501,30 @@ public class InstructionType {
      */
     public void setId(String value) {
         this.id = value;
+    }
+
+    /**
+     * Gets the value of the objid property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getObjid() {
+        return objid;
+    }
+
+    /**
+     * Sets the value of the objid property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setObjid(String value) {
+        this.objid = value;
     }
 
 }
