@@ -150,6 +150,21 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute type="xs:string" name="deleteCompletedInstruction">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">deleteCompletedInstruction: true or false. Removes the instruction
+                    if it completed without errors.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" name="replaceExistingDerivatives">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">replaceExistingDerivatives: true or false. If the plan is set to
+                    create derivatives, the value true will replace any preexisting derivatives. If false any
+                    preexisting derivatives will not be replaced.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 
 </xs:schema>

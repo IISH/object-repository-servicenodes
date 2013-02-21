@@ -48,6 +48,8 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="version" type="{http://www.w3.org/2001/XMLSchema}long" default="0" />
  *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="objid" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="deleteCompletedInstruction" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="replaceExistingDerivatives" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -104,6 +106,10 @@ public class InstructionType {
     protected String id;
     @XmlAttribute
     protected String objid;
+    @XmlAttribute
+    protected String deleteCompletedInstruction;
+    @XmlAttribute
+    protected String replaceExistingDerivatives;
 
     /**
      * Gets the value of the workflow property.
@@ -525,6 +531,54 @@ public class InstructionType {
      */
     public void setObjid(String value) {
         this.objid = value;
+    }
+
+    /**
+     * Gets the value of the deleteCompletedInstruction property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getDeleteCompletedInstruction() {
+        return deleteCompletedInstruction;
+    }
+
+    /**
+     * Sets the value of the deleteCompletedInstruction property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setDeleteCompletedInstruction(String value) {
+        this.deleteCompletedInstruction = value;
+    }
+
+    /**
+     * Gets the value of the replaceExistingDerivatives property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getReplaceExistingDerivatives() {
+        return replaceExistingDerivatives;
+    }
+
+    /**
+     * Sets the value of the replaceExistingDerivatives property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setReplaceExistingDerivatives(String value) {
+        this.replaceExistingDerivatives = value;
     }
 
 }
