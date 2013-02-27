@@ -58,7 +58,7 @@ public final class InstructionIngestService implements ServiceBase {
         while (instruction.hasNext()) {
             final StagingfileType stagingfileType = instruction.next();
             if (instructionValidate.isMarkedAsValid(stagingfileType)) {
-                if (stagingfileType.getSeq() == 0) {
+                if (stagingfileType.getSeq() == null || stagingfileType.getSeq() == 0) {
                     stagingfileType.setSeq(++seq);
                 }
                 TaskType task = objectFactory.createTaskType();
