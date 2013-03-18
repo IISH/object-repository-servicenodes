@@ -104,16 +104,20 @@ public final class InstructionAutocreateService extends ServiceBaseImp {
                             getPid(iterator.getInstruction(), stagingfileType.getLid()));
                 }
             }
-
-            // Objid
-            LinkedList list = new LinkedList(Arrays.asList(stagingfileType.getLocation().split("/")));
-            list.remove(list.size() - 1);
-            list.remove(0);
-            String objid = iterator.getInstruction().getNa() + "/" + StringUtils.join(list, '.');
-            stagingfileType.setObjid(objid);
+            objid(iterator.getInstruction(), stagingfileType);
         }
         if (Normalizers.isEmpty(stagingfileType.getPid())) {
             customInfo(stagingfileType, new InstructionException("PidMissing"));
+        }
+    }
+
+    private void objid(InstructionType instruction, StagingfileType stagingfileType) {
+        if (instruction.getObjid() == null) {
+            LinkedList list = new LinkedList(Arrays.asList(stagingfileType.getLocation().split("/")));
+            list.remove(list.size() - 1);
+            list.remove(0);
+            String objid = instruction.getNa() + "/" + StringUtils.join(list, '.');
+            stagingfileType.setObjid(objid);
         }
     }
 
