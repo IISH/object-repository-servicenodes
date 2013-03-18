@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 
 /*
@@ -58,7 +59,9 @@ public abstract class ServiceBaseImp implements ServiceBase {
      * @param instruction
      */
     private void getFolders(File folder, OrIterator instruction) {
-        for (File file : folder.listFiles()) {
+        File[] files = folder.listFiles();
+        Arrays.sort(files);
+        for (File file : files) {
             if (Counting.skip(file.getName())) {  // Ignore the self and hidden folders.
                 continue;
             }

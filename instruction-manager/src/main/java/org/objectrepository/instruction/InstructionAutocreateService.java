@@ -101,6 +101,10 @@ public final class InstructionAutocreateService extends ServiceBaseImp {
                             getPid(iterator.getInstruction(), stagingfileType.getLid()));
                 }
             }
+
+            // Objid
+            //final File parent = new File(stagingfileType.getLocation()).getParentFile();
+            //stagingfileType.setObjid(iterator.getInstruction().getNa() + "/" + parent.getName());
         }
         if (Normalizers.isEmpty(stagingfileType.getPid())) {
             customInfo(stagingfileType, new InstructionException("PidMissing"));
