@@ -16,6 +16,7 @@
 package org.objectrepository.instruction;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.objectrepository.exceptions.InstructionException;
 import org.objectrepository.instruction.dao.OrIterator;
 import org.objectrepository.pid.PidHttpClient;
@@ -25,6 +26,8 @@ import org.objectrepository.util.PidGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.LinkedList;
 
 /**
  * InstructionAutocreateService
@@ -103,8 +106,11 @@ public final class InstructionAutocreateService extends ServiceBaseImp {
             }
 
             // Objid
-            //final File parent = new File(stagingfileType.getLocation()).getParentFile();
-            //stagingfileType.setObjid(iterator.getInstruction().getNa() + "/" + parent.getName());
+            LinkedList list = new LinkedList(Arrays.asList(stagingfileType.getLocation().split("/")));
+            list.remove(list.size() - 1);
+            list.remove(0);
+            String objid = iterator.getInstruction().getNa() + "/" + StringUtils.join(list, '.');
+            stagingfileType.setObjid(objid);
         }
         if (Normalizers.isEmpty(stagingfileType.getPid())) {
             customInfo(stagingfileType, new InstructionException("PidMissing"));
