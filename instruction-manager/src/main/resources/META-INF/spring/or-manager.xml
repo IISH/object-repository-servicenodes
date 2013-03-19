@@ -54,8 +54,10 @@
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
         <property name="brokerURL" value="#{clientProperties['grails.plugin.routing.jms.brokerURL']}"/>
     </bean>
+<!--
     <camel:camelContext>
         <camel:template id="producer" defaultEndpoint="activemq:status"/>
     </camel:camelContext>
+-->
 
 </beans>

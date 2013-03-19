@@ -16,7 +16,6 @@
 
 package org.objectrepository.instruction;
 
-import org.apache.camel.ProducerTemplate;
 import org.apache.log4j.Logger;
 import org.objectrepository.instruction.dao.OrIterator;
 import org.objectrepository.instruction.dao.ServiceBase;
@@ -39,9 +38,6 @@ public final class InstructionIngestService implements ServiceBase {
 
     @Autowired
     ObjectFactory objectFactory;
-
-    @Autowired
-    ProducerTemplate producer;
 
     /**
      * build
@@ -74,23 +70,10 @@ public final class InstructionIngestService implements ServiceBase {
                 task.setIdentifier(UUID.randomUUID().toString());
                 InstructionTypeHelper.setSingleTask(stagingfileType, task);
                 instruction.add(stagingfileType);
-
-                try {
-                    producer.sendBody(task.getIdentifier());
-                } catch (Exception e) {
-                    log.warn(e);
-                }
-
             } else {
                 log.warn("Invalid document " + stagingfileType.getLocation());
                 return;
             }
-        }
-
-        try {
-            producer.stop();
-        } catch (Exception e) {
-            log.warn(e);
         }
     }
 
