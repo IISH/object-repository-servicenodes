@@ -49,7 +49,7 @@ public class OrFilesTest {
         downLoadFile.delete();
         Assert.assertFalse("Unit test should really not contain a stagingfile until the action is called to download it from the database.", downLoadFile.exists());
 
-        final String md5 = Checksum.getMD5(f);
+        final String md5 = Checksum.getMD5(f, false);
         add(md5, bucket, url, null, null);
 
         OrGet getFile = new OrGet();
@@ -88,7 +88,7 @@ public class OrFilesTest {
         final URL url = getClass().getResource(file);
         final File f = new File(url.getFile());
 
-        final String pid = Checksum.getMD5(f);
+        final String pid = Checksum.getMD5(f, false);
         add(pid, bucket, url, null, null);
 
         final String md5Liar = "000000000000FF";
@@ -105,7 +105,7 @@ public class OrFilesTest {
         final URL url = getClass().getResource(file);
         final URL urlUpdate = getClass().getResource(fileUpdate);
         final File f = new File(url.getFile());
-        final String pid = Checksum.getMD5(f);
+        final String pid = Checksum.getMD5(f, false);
 
         add(pid, bucket, url, null, null);
         add(pid, bucket, urlUpdate, null, null);
@@ -172,7 +172,7 @@ public class OrFilesTest {
         final URL url = getClass().getResource(file);
         final URL urlUpdate = getClass().getResource(fileUpdate);
         final File f = new File(url.getFile());
-        final String pid = Checksum.getMD5(f);
+        final String pid = Checksum.getMD5(f, false);
 
         final OrPut putFile = new OrPut();
         putFile.setMongo(hosts);

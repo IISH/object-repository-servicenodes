@@ -64,7 +64,7 @@ public final class InstructionAutocreateService extends ServiceBaseImp {
         //will  provide a PID
         final String location = Normalizers.toRelative(instruction.getInstruction().getFileSet(), file);
         stagingfileType.setLocation(location);
-        stagingfileType.setMd5(Checksum.getMD5(file));
+        stagingfileType.setMd5(Checksum.getMD5(file, true));
         stagingfileType.setLength(file.length());
         addPid(instruction, stagingfileType);
         validateService.isValid(instruction, stagingfileType);

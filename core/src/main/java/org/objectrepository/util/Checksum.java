@@ -80,7 +80,7 @@ public class Checksum {
      * @param file
      * @return
      */
-    public static String getMD5(File file) {
+    private static String getMD5(File file) {
 
         final Date start = new Date();
         String md5 = null;
@@ -98,6 +98,13 @@ public class Checksum {
         log.debug(String.valueOf(time / 1000) + " " + md5);
 
         return md5;
+    }
+
+    public static String getMD5(File file, boolean fromCache) {
+        if (fromCache) return getMD5(file);
+        final File md5File = new File(file.getAbsoluteFile() + ".md5");
+        if (md5File.exists()) md5File.delete();
+        return getMD5(file);
     }
 
     public static String getMD5(byte[] writeBuffer) {
@@ -229,4 +236,5 @@ public class Checksum {
             System.out.print(md5);
         }
     }
+
 }

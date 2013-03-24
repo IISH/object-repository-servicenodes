@@ -45,7 +45,7 @@ public class ChecksumTest {
         File folder = new File(fileSet);
         for (File file : folder.listFiles()) {
             if (file.isFile()) {
-                final String md5 = Checksum.getMD5(file);
+                final String md5 = Checksum.getMD5(file, true);
                 Assert.assertNotNull(md5);
             }
         }

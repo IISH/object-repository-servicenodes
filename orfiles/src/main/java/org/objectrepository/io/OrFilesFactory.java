@@ -218,7 +218,7 @@ public abstract class OrFilesFactory implements OrFiles {
         if (m == null || m.isEmpty()) {  // fail back...
             final File localFile = new File(getL());
             log.warn("Need to fallback on calculating an md5 checksum as the value is not passed from the command line .");
-            m = Checksum.getMD5(localFile);
+            m = Checksum.getMD5(localFile, true);
         }
 
         return Checksum.getMD5as32Characters(m);

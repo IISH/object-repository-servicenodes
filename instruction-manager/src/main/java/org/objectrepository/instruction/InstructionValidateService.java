@@ -245,9 +245,10 @@ public final class InstructionValidateService extends ServiceBaseImp {
         final String md5_from_instruction = stagingfileType.getMd5();
         if (md5_from_instruction == null)
             throw new InstructionException("MD5Missing");
-
-        final String md5_from_file = Checksum.getMD5(file);
-        final boolean identical = Checksum.compare(md5_from_file, md5_from_instruction);
+        boolean identical = Checksum.compare(Checksum.getMD5(file, true), md5_from_instruction);
+        if (!identical) {
+            identical = Checksum.compare(Checksum.getMD5(file, false), md5_from_instruction);
+        }
         if (!identical) {
             throw new InstructionException("MD5Mismatch");
         }
