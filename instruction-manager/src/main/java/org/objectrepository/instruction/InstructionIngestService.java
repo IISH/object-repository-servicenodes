@@ -70,8 +70,8 @@ public final class InstructionIngestService implements ServiceBase {
                 InstructionTypeHelper.setSingleTask(stagingfileType, task);
                 instruction.add(stagingfileType);
             } else {
-                log.fatal("Invalid document " + stagingfileType.getLocation());
-                System.exit(-1);
+                log.warn("Invalid document " + stagingfileType.getLocation());
+                return;
             }
         }
     }
