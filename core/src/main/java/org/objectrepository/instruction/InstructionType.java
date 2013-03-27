@@ -50,6 +50,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="objid" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="deleteCompletedInstruction" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="replaceExistingDerivatives" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="pdfLevel" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -110,6 +111,8 @@ public class InstructionType {
     protected String deleteCompletedInstruction;
     @XmlAttribute
     protected String replaceExistingDerivatives;
+    @XmlAttribute
+    protected String pdfLevel;
 
     /**
      * Gets the value of the workflow property.
@@ -579,6 +582,30 @@ public class InstructionType {
      */
     public void setReplaceExistingDerivatives(String value) {
         this.replaceExistingDerivatives = value;
+    }
+
+    /**
+     * Gets the value of the pdfLevel property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getPdfLevel() {
+        return pdfLevel;
+    }
+
+    /**
+     * Sets the value of the pdfLevel property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setPdfLevel(String value) {
+        this.pdfLevel = value;
     }
 
 }
