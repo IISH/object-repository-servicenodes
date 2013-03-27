@@ -67,12 +67,11 @@ public final class InstructionIngestService implements ServiceBase {
                 task.setAttempts(1);
                 task.setLimit(3);
                 task.setExitValue(Integer.MAX_VALUE);
-                task.setIdentifier(UUID.randomUUID().toString());
                 InstructionTypeHelper.setSingleTask(stagingfileType, task);
                 instruction.add(stagingfileType);
             } else {
-                log.warn("Invalid document " + stagingfileType.getLocation());
-                return;
+                log.fatal("Invalid document " + stagingfileType.getLocation());
+                System.exit(-1);
             }
         }
     }
