@@ -104,13 +104,22 @@ public final class InstructionAutocreateService extends ServiceBaseImp {
                             getPid(iterator.getInstruction(), stagingfileType.getLid()));
                 }
             }
-            objid(iterator.getInstruction(), stagingfileType);
+            //objid(iterator.getInstruction(), stagingfileType);
         }
         if (Normalizers.isEmpty(stagingfileType.getPid())) {
             customInfo(stagingfileType, new InstructionException("PidMissing"));
         }
     }
 
+    /**
+     * objid
+     *
+     * Add an object ID based on the folder structure:
+     * /a/b/c/d becomes [na]/a.b.c.d
+     *
+     * @param instruction
+     * @param stagingfileType
+     */
     private void objid(InstructionType instruction, StagingfileType stagingfileType) {
         if (instruction.getObjid() == null) {
             LinkedList list = new LinkedList(Arrays.asList(stagingfileType.getLocation().split("/")));
