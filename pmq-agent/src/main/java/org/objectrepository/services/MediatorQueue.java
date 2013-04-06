@@ -35,16 +35,16 @@ public class MediatorQueue implements Runnable {
     private ConsumerTemplate consumer;
     private String messageQueue;
     private String shellScript;
-    private long period;
+    private long heartbeatInterval;
     private ProducerTemplate producer;
 
-    public MediatorQueue(MongoTemplate mongoTemplate, ConsumerTemplate consumer, ProducerTemplate producer, String messageQueue, String shellScript, long period) {
+    public MediatorQueue(MongoTemplate mongoTemplate, ConsumerTemplate consumer, ProducerTemplate producer, String messageQueue, String shellScript, long heartbeatInterval) {
         this.mongoTemplate = mongoTemplate;
         this.consumer = consumer;
         this.producer = producer;
         this.messageQueue = messageQueue;
         this.shellScript = shellScript;
-        this.period = period;
+        this.heartbeatInterval = heartbeatInterval;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class MediatorQueue implements Runnable {
 
         final long start = new Date().getTime();
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new HeartBeat(mongoTemplate, messageQueue, StatusCodeTaskReceipt, identifier, start), period, period);
+        timer.scheduleAtFixedRate(new HeartBeat(mongoTemplate, messageQueue, StatusCodeTaskReceipt, identifier, start), 10000, heartbeatInterval);
 
 
         DefaultExecutor executor = new DefaultExecutor();

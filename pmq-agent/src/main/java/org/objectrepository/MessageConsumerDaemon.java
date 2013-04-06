@@ -35,7 +35,8 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
     private boolean keepRunning = true;
     private GenericXmlApplicationContext context;
     private long timer;
-    private long period = 10000;
+    private long timerInterval = 10000;
+    private long heartbeatInterval = 10000;
     private List<Queue> taskExecutors;
     private String identifier;
     final private static Logger log = Logger.getLogger(MessageConsumerDaemon.class);
@@ -43,7 +44,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
     private boolean stop = false;
 
     private MessageConsumerDaemon() {
-        timer = System.currentTimeMillis() + period;
+        timer = System.currentTimeMillis() + timerInterval;
     }
 
     public void run() {
@@ -94,20 +95,20 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             return new MediatorTopic(this, context.getBean(ConsumerTemplate.class), "activemq:topic:" + queue.getQueueName());
         } else {
             log.info("Adding queue consumer for " + queue.getQueueName());
-            return new MediatorQueue(context.getBean(MongoTemplate.class), context.getBean(ConsumerTemplate.class), context.getBean(ProducerTemplate.class), "activemq:" + queue.getQueueName(), queue.getShellScript(), period);
+            return new MediatorQueue(context.getBean(MongoTemplate.class), context.getBean(ConsumerTemplate.class), context.getBean(ProducerTemplate.class), "activemq:" + queue.getQueueName(), queue.getShellScript(), heartbeatInterval);
         }
     }
 
     /**
      * heartbeat
      * <p/>
-     * Keeps the overall environment healthy by pausing.
+     * Keeps the overall environment from overworking by pausing every ten seconds or so.
      */
     private void heartbeat() {
 
         long currentTime = System.currentTimeMillis();
         if (timer - currentTime < 0) {
-            timer = currentTime + period;
+            timer = currentTime + timerInterval;
             if (isPause()) {
                 log.info("We are in pause mode.");
             } else {
@@ -147,13 +148,14 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
         throw new CloneNotSupportedException();
     }
 
-    public static synchronized MessageConsumerDaemon getInstance(List<Queue> queues, String identifier) {
+    public static synchronized MessageConsumerDaemon getInstance(List<Queue> queues, String identifier, long heartbeatInterval) {
 
         if (instance == null) {
             instance = new MessageConsumerDaemon();
             instance.setTaskExecutors(queues);
             instance.setIdentifier(identifier);
             instance.setDaemon(true);
+            instance.setHeartbeatInterval(heartbeatInterval);
         }
         return instance;
     }
@@ -165,6 +167,8 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
      * That folder ought to contain one or more folders ( or symbolic links ) to the files
      * The folder has the format: [foldername] or [foldername].[maxTasks]
      * MaxTasks is to indicate the total number of jobs being able to run.
+     *
+     * long
      *
      * @param argv
      */
@@ -183,7 +187,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                     }
                 }
             } else {
-                log.fatal("Usage: pmq-agent.jar -messageQueues queues\n" +
+                log.fatal("Usage: pmq-agent.jar -messageQueues [queues] -heartbeatInterval [interval in ms]\n" +
                         "The queues is a folder that contains symbolic links to the startup scripts.");
                 System.exit(-1);
             }
@@ -209,6 +213,11 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             if (messageQueues.isFile()) {
                 log.fatal("-messageQueues should point to a folder, not a file: " + messageQueues.getAbsolutePath());
                 System.exit(-1);
+            }
+
+            long heartbeatInterval = 600000;
+            if (properties.containsKey("-heartbeatInterval")) {
+                heartbeatInterval = Long.parseLong((String) properties.get("heartbeatInterval"));
             }
 
             String identifier = null;
@@ -252,7 +261,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             // Add the system queue
             queues.add(new Queue("Connection", null, true));
 
-            getInstance(queues, identifier).run();
+            getInstance(queues, identifier, heartbeatInterval).run();
         }
         System.exit(0);
     }
@@ -283,5 +292,9 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
     public void setStop(boolean stop) {
         this.stop = stop;
+    }
+
+    public void setHeartbeatInterval(long heartbeatInterval) {
+        this.heartbeatInterval = heartbeatInterval;
     }
 }
