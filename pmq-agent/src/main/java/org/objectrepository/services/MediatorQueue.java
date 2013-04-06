@@ -35,6 +35,7 @@ public class MediatorQueue implements Runnable {
     private ConsumerTemplate consumer;
     private String messageQueue;
     private String shellScript;
+    private long timerDelay = 10000;
     private long heartbeatInterval;
     private ProducerTemplate producer;
 
@@ -103,7 +104,7 @@ public class MediatorQueue implements Runnable {
 
         final long start = new Date().getTime();
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new HeartBeat(mongoTemplate, messageQueue, StatusCodeTaskReceipt, identifier, start), 10000, heartbeatInterval);
+        timer.scheduleAtFixedRate(new HeartBeat(mongoTemplate, messageQueue, StatusCodeTaskReceipt, identifier, start), timerDelay, heartbeatInterval);
 
 
         DefaultExecutor executor = new DefaultExecutor();
