@@ -35,7 +35,7 @@ public class MediatorQueue implements Runnable {
     private ConsumerTemplate consumer;
     private String messageQueue;
     private String shellScript;
-    private long timerDelay = 10000;
+    private long timerDelay = 10;
     private long heartbeatInterval;
     private ProducerTemplate producer;
 
@@ -144,12 +144,11 @@ public class MediatorQueue implements Runnable {
         timer.cancel();
         if (failure) return;
 
-        final String s = stdout.toString();
-        String info = (resultHandler.getExitValue() == 0) ? null : "Fail: " + s;
-        if (info != null && info.length() > 1000)
-            info = "Fail (...only showing last 1000 characters of error message): " + info.substring(info.length() - 1000);
+        final String p = "Last 1000 characters of message are: ";
+        String info = (resultHandler.getExitValue() == 0) ? null :
+                (stdout.size() > 1000) ? p + stdout.toString().substring(stdout.size() - 1000) : p + stdout.toString();
         log.info("resultHandler.exitValue=" + resultHandler.getExitValue());
-        log.info("resultHandler.stdout=" + s);
+        log.info((stdout.size() > 10000) ? info : stdout.toString());
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskComplete, info, identifier, resultHandler.getExitValue());
         producer.sendBody(identifier);
     }
