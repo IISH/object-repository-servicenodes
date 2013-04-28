@@ -148,7 +148,7 @@ public class MediatorQueue implements Runnable {
         String info = (resultHandler.getExitValue() == 0) ? null :
                 (stdout.size() > 1000) ? p + stdout.toString().substring(stdout.size() - 1000) : p + stdout.toString();
         log.info("resultHandler.exitValue=" + resultHandler.getExitValue());
-        log.info((stdout.size() > 10000) ? info : stdout.toString());
+        log.info((stdout.size() > 10000) ? stdout.toString().substring(stdout.size() - 10000) : stdout.toString());
         HeartBeats.message(mongoTemplate, messageQueue, StatusCodeTaskComplete, info, identifier, resultHandler.getExitValue());
         producer.sendBody(identifier);
     }
