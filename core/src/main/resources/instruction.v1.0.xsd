@@ -140,6 +140,11 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute type="xs:string" name="resubmitPid">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">resubmitPid (system): The name of a persistent identifier of an already ingested file.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="stagingfileType">

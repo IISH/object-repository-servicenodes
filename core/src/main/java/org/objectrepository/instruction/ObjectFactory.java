@@ -35,19 +35,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link StagingfileType }
-     * 
-     */
-    public StagingfileType createStagingfileType() {
-        return new StagingfileType();
-    }
-
-    /**
      * Create an instance of {@link InstructionType }
      * 
      */
     public InstructionType createInstructionType() {
         return new InstructionType();
+    }
+
+    /**
+     * Create an instance of {@link StagingfileType }
+     * 
+     */
+    public StagingfileType createStagingfileType() {
+        return new StagingfileType();
     }
 
     /**
