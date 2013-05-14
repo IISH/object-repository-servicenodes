@@ -51,7 +51,6 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="deleteCompletedInstruction" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="replaceExistingDerivatives" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="pdfLevel" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="resubmitPid" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -114,8 +113,6 @@ public class InstructionType {
     protected String replaceExistingDerivatives;
     @XmlAttribute
     protected String pdfLevel;
-    @XmlAttribute
-    protected String resubmitPid;
 
     /**
      * Gets the value of the workflow property.
@@ -609,30 +606,6 @@ public class InstructionType {
      */
     public void setPdfLevel(String value) {
         this.pdfLevel = value;
-    }
-
-    /**
-     * Gets the value of the resubmitPid property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getResubmitPid() {
-        return resubmitPid;
-    }
-
-    /**
-     * Sets the value of the resubmitPid property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setResubmitPid(String value) {
-        this.resubmitPid = value;
     }
 
 }
