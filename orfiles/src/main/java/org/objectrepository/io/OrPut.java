@@ -113,13 +113,18 @@ public class OrPut extends OrFilesFactory {
         gridFile.setId(shardKey);
         gridFile.setMetaData(new BasicDBObject("pid", semiPid));
         gridFile.setContentType(getT());
+        log.info("Saving file with semiPid " + semiPid);
         gridFile.save();
+        log.info("File saved.");
 
         boolean isMatch = Checksum.compare(getMd5(), gridFile.getMD5());
         if (isMatch) {
+            log.info("File match ok. Removing now old document (if any) with pid " + getA());
             getGridFS().remove(new BasicDBObject("metadata.pid", getA()));
             final BasicDBObject update = new BasicDBObject().append("$set", new BasicDBObject().append("metadata.pid", getA()));
+            log.info("File removed. Updating pid from " + semiPid + " to " + getA());
             getFilesCollection().update(new BasicDBObject("metadata.pid", semiPid), update, false, true);
+            log.info("PID updated.");
         } else {
             final String message = "The md5 that was offered (" + getMd5() + ") and the md5 ingested (" + gridFile.getMD5() + ") do not match ! The file will ne removed from the database.";
             getGridFS().remove(new BasicDBObject("_id", shardKey));
