@@ -123,7 +123,7 @@ public class OrPut extends OrFilesFactory {
             getGridFS().remove(new BasicDBObject("metadata.pid", getA()));
             final BasicDBObject update = new BasicDBObject().append("$set", new BasicDBObject().append("metadata.pid", getA()));
             log.info("File removed. Updating pid from " + semiPid + " to " + getA());
-            getFilesCollection().update(new BasicDBObject("metadata.pid", semiPid), update, false, true);
+            getFilesCollection().update(new BasicDBObject("metadata.pid", semiPid), update, false, false);
             log.info("PID updated.");
         } else {
             final String message = "The md5 that was offered (" + getMd5() + ") and the md5 ingested (" + gridFile.getMD5() + ") do not match ! The file will ne removed from the database.";

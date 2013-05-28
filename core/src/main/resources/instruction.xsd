@@ -167,7 +167,7 @@
         </xs:attribute>
         <xs:attribute type="xs:string" name="pdfLevel">
             <xs:annotation>
-                <xs:documentation xml:lang="en">pdfLevel: true or false. De derivative level to be used when rendering a pdf.
+                <xs:documentation xml:lang="en">pdfLevel: The derivative level to be used when rendering a pdf.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
