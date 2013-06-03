@@ -39,6 +39,8 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="length" type="{http://www.w3.org/2001/XMLSchema}long" minOccurs="0"/>
  *         &lt;element name="contentType" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="access" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="embargo" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="embargoAccess" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="version" type="{http://www.w3.org/2001/XMLSchema}long"/>
  *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="objid" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
@@ -64,6 +66,8 @@ import javax.xml.bind.annotation.XmlType;
     "length",
     "contentType",
     "access",
+    "embargo",
+    "embargoAccess",
     "version",
     "id",
     "objid",
@@ -93,6 +97,10 @@ public class StagingfileType {
     protected String contentType;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
     protected String access;
+    @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
+    protected String embargo;
+    @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
+    protected String embargoAccess;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/", defaultValue = "0")
     protected long version;
     @XmlElement(namespace = "http://objectrepository.org/instruction/1.0/")
@@ -369,6 +377,54 @@ public class StagingfileType {
      */
     public void setAccess(String value) {
         this.access = value;
+    }
+
+    /**
+     * Gets the value of the embargo property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getEmbargo() {
+        return embargo;
+    }
+
+    /**
+     * Sets the value of the embargo property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setEmbargo(String value) {
+        this.embargo = value;
+    }
+
+    /**
+     * Gets the value of the embargoAccess property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getEmbargoAccess() {
+        return embargoAccess;
+    }
+
+    /**
+     * Sets the value of the embargoAccess property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setEmbargoAccess(String value) {
+        this.embargoAccess = value;
     }
 
     /**

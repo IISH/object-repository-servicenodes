@@ -33,6 +33,8 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="na" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="contentType" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="access" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
+ *       &lt;attribute name="embargo" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="embargoAccess" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="action">
  *         &lt;simpleType>
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
@@ -95,6 +97,10 @@ public class InstructionType {
     @XmlAttribute
     @XmlSchemaType(name = "anySimpleType")
     protected String access;
+    @XmlAttribute
+    protected String embargo;
+    @XmlAttribute
+    protected String embargoAccess;
     @XmlAttribute
     protected String action;
     @XmlAttribute
@@ -386,6 +392,54 @@ public class InstructionType {
      */
     public void setAccess(String value) {
         this.access = value;
+    }
+
+    /**
+     * Gets the value of the embargo property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getEmbargo() {
+        return embargo;
+    }
+
+    /**
+     * Sets the value of the embargo property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setEmbargo(String value) {
+        this.embargo = value;
+    }
+
+    /**
+     * Gets the value of the embargoAccess property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getEmbargoAccess() {
+        return embargoAccess;
+    }
+
+    /**
+     * Sets the value of the embargoAccess property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setEmbargoAccess(String value) {
+        this.embargoAccess = value;
     }
 
     /**

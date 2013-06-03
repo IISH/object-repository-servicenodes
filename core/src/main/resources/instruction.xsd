@@ -106,6 +106,18 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute type="xs:string" name="embargo">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">embargo: The embargo date (YYYY-MM-DD).</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" name="embargoAccess">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">embargoAccess: The embargoAccess to be applied then the embargo date is
+                    in effect.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
         <xs:attribute name="action">
             <xs:annotation>
                 <xs:documentation xml:lang="en">action : how to treat the file.
@@ -171,5 +183,6 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+
     </xs:complexType>
 </xs:schema>

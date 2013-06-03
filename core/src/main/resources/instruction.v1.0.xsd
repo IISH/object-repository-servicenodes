@@ -198,6 +198,19 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element type="xs:string" name="embargo" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">embargo : embargo: The embargo date (YYYY-MM-DD).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element type="xs:string" name="embargoAccess" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">embargoAccess: The embargoAccess to be applied then the embargo date
+                        is in effect.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element type="xs:int" name="objid" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">objid: the METS object identifier where this file and it's
