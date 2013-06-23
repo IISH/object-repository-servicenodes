@@ -91,6 +91,7 @@ public final class InstructionManager {
     }
 
     public void InstructionIngest(InstructionType instructionType) {
+        log.error("InstructionIngest is deprecated.");
         try {
             OrIterator instruction = dao.load(instructionType);
             instructionInstructionIngest.build(instruction);

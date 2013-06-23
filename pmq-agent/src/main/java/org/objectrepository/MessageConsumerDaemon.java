@@ -215,7 +215,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 System.exit(-1);
             }
 
-            long heartbeatInterval = 3600000;
+            long heartbeatInterval = 600000;
             if (properties.containsKey("-heartbeatInterval")) {
                 heartbeatInterval = Long.parseLong((String) properties.get("heartbeatInterval"));
             }
