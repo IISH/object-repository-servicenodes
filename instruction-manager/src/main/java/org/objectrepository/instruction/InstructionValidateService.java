@@ -200,10 +200,12 @@ public final class InstructionValidateService extends ServiceBaseImp {
                     throw new InstructionException("MissingMimeType");
                 }
 
-                fileTypeForFile(stagingfileType, file);
             }
 
+            fileTypeForFile(stagingfileType, file);
+
             // make sure a PID or LID value is not repeated.
+
             int expect = (InstructionTypeHelper.firstTask(instruction.getInstruction()).getName().equals("InstructionValidate")) ? 1 : 0;
             int count = instruction.countByKey("lid", stagingfileType.getLid());
             if (count != -1 && count != expect) {
