@@ -131,7 +131,6 @@ public final class InstructionValidateService extends ServiceBaseImp {
      *                    <li>if no NA value is provided in the header, AND no pid values provided for the stagingfile (errorCode MissingNAValue)
      * @param instruction - that contains the section on fileTypes
      * @throws org.objectrepository.exceptions.InstructionException
-     *
      * @throws IOException
      * @throws NoSuchAlgorithmException
      * @see ServiceBaseImp
@@ -179,16 +178,16 @@ public final class InstructionValidateService extends ServiceBaseImp {
             }
 
             if (action.equalsIgnoreCase("delete")) return false;
-            final boolean hasFiles = orDaoImp.hasFiles(instruction.getInstruction().getNa(), stagingfileType.getPid());
-            if (action.equalsIgnoreCase("add") && hasFiles) {
+            final boolean hasStoredObject = orDaoImp.hasFiles(instruction.getInstruction().getNa(), stagingfileType.getPid());
+            if (action.equalsIgnoreCase("add") && hasStoredObject) {
                 throw new InstructionException("ExpectUpdate");
             }
-            if (action.equalsIgnoreCase("update") && !hasFiles) {
+            if (action.equalsIgnoreCase("update") && !hasStoredObject) {
                 throw new InstructionException("ExpectAdd");
             }
 
             // Add like operations, need more metadata
-            if (action.equalsIgnoreCase("add") || action.equalsIgnoreCase("upsert") && !hasFiles) {
+            if (action.equalsIgnoreCase("add") || action.equalsIgnoreCase("upsert") && !hasStoredObject) {
 
                 //check for access
                 if (Normalizers.isEmpty(global.getAccess()) && Normalizers.isEmpty(stagingfileType.getAccess())) {
@@ -202,7 +201,8 @@ public final class InstructionValidateService extends ServiceBaseImp {
 
             }
 
-            fileTypeForFile(stagingfileType, file);
+            if (action.equalsIgnoreCase("add") || file.exists() && file.isFile())
+                fileTypeForFile(stagingfileType, file);
 
             // make sure a PID or LID value is not repeated.
 
@@ -215,12 +215,6 @@ public final class InstructionValidateService extends ServiceBaseImp {
             if (count != -1 && count != expect) {
                 throw new InstructionException("PidMultiplication");
             }
-
-            // make sure the md5 is not repeated.
-            /*count = instruction.countByKey("md5", stagingfileType.getMd5());
-            if (count != -1 && count != expect) {
-                throw new InstructionException("MD5Multiplication");
-            }*/
 
         } catch (InstructionException se) {
             customInfo(stagingfileType, se);

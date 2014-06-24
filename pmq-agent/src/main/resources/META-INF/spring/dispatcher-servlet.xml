@@ -44,7 +44,7 @@
 
     <bean id="marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
         <property name="contextPaths" value="org.objectrepository.instruction"/>
-        <!--<property name="schema" value="classpath:instruction.xsd"/>-->
+        <!--<property name="schema" value="classpath:instruction-v1.0"/>-->
     </bean>
 
     <camel:camelContext>
