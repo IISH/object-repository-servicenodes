@@ -95,8 +95,8 @@ public final class InstructionValidateService extends ServiceBaseImp {
                 if (action.equalsIgnoreCase("add")) {
                     throw new InstructionException("ExpectFileAdd");
                 }
-                if (action.equalsIgnoreCase("upsert") && !orDaoImp.hasFiles(instruction.getNa(), stagingfileType.getPid())) {
-                    throw new InstructionException("ExpectFileUpsert");
+                if (action.equalsIgnoreCase("update") && !orDaoImp.hasStoredObject(instruction.getNa(), stagingfileType.getPid())) {
+                    throw new InstructionException("ExpectFileUpdate");
                 }
                 return false;
             }
@@ -106,8 +106,8 @@ public final class InstructionValidateService extends ServiceBaseImp {
         }
 
         try {
-            File file = Normalizers.toAbsolute(instruction.getFileSet(), stagingfileType.getLocation());
-            if (!file.exists())
+            final File file = Normalizers.toAbsolute(instruction.getFileSet(), stagingfileType.getLocation());
+            if (!file.exists() || file.isDirectory())
                 throw new InstructionException("FileDoesNotExist");
         } catch (InstructionException se) {
             customInfo(stagingfileType, se);
@@ -178,7 +178,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
             }
 
             if (action.equalsIgnoreCase("delete")) return false;
-            final boolean hasStoredObject = orDaoImp.hasFiles(instruction.getInstruction().getNa(), stagingfileType.getPid());
+            final boolean hasStoredObject = orDaoImp.hasStoredObject(instruction.getInstruction().getNa(), stagingfileType.getPid());
             if (action.equalsIgnoreCase("add") && hasStoredObject) {
                 throw new InstructionException("ExpectUpdate");
             }
@@ -201,7 +201,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
 
             }
 
-            if (action.equalsIgnoreCase("add") || file.exists() && file.isFile())
+            if (action.equalsIgnoreCase("add") || stagingfileType.getLocation() != null)
                 fileTypeForFile(stagingfileType, file);
 
             // make sure a PID or LID value is not repeated.
@@ -232,7 +232,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
 
     private void fileTypeForFile(StagingfileType stagingfileType, File file) throws InstructionException {
 
-        if (!file.canRead())
+        if (file == null || !file.canRead() || file.isDirectory())
             throw new InstructionException("CantReadFile");
 
         if (file.length() == 0)
