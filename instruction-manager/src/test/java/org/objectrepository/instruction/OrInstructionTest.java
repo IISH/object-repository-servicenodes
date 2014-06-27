@@ -595,7 +595,7 @@ public class OrInstructionTest {
 
         while (iterator.hasNext()) {
             final StagingfileType stagingfileType = iterator.next();
-            stagingfileType.setAction("upsert");
+            stagingfileType.setAction("update");
             stagingfileType.setLocation(null);
             stagingfileType.getWorkflow().clear();
             orFsIterator.add(stagingfileType);
@@ -605,7 +605,7 @@ public class OrInstructionTest {
         instructionManager.InstructionUpload(iterator.getInstruction());
         iterator = dao.load(iterator.getInstruction());
         Map statusCodes = Utils.statusCodes(iterator);
-        Assert.assertEquals(16, statusCodes.get(InstructionException.ExpectFileUpsert));
+        Assert.assertEquals(16, statusCodes.get(InstructionException.ExpectFileUpdate));
     }
 
     @Test
