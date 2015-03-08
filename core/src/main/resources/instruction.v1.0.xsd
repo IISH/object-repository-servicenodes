@@ -211,7 +211,7 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element type="xs:int" name="objid" minOccurs="0" maxOccurs="1">
+            <xs:element type="xs:string" name="objid" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">objid: the METS object identifier where this file and it's
                         derivatives will belong to. It must be a persistent identifier without the resolve URL.

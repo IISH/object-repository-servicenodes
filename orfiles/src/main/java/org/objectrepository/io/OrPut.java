@@ -1,8 +1,6 @@
 package org.objectrepository.io;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBCollection;
+import com.mongodb.*;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 import org.apache.log4j.Logger;
@@ -82,8 +80,13 @@ public class OrPut extends OrFilesFactory {
 
         final Double _id = getS();
         if (_id == 0) throw new OrFilesException("Shardkey cannot be absent or zero.");
-        if (getGridFS().findOne(new BasicDBObject("_id", _id)) == null) return _id;
-        throw new OrFilesException("The shardkey is already taken. It must be unique.");
+
+        final DBObject findReservation = QueryBuilder.start("_id").is(_id).and("reserved").is(true).get();
+        final DBObject reserved = getGridFS().findOne(findReservation);
+        if (reserved == null)
+            throw new OrFilesException("The shardkey is not reserved. It must be done so by the shardkey.js provider.");
+        else
+            return _id;
     }
 
     /**
@@ -96,7 +99,6 @@ public class OrPut extends OrFilesFactory {
      *
      * @param localFile
      * @throws org.objectrepository.exceptions.OrFilesException
-     *
      */
     private void addFile(File localFile, Object shardKey) throws OrFilesException {
 

@@ -1,6 +1,7 @@
 package org.objectrepository.io;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.WriteConcern;
 import com.mongodb.gridfs.GridFSDBFile;
 import org.junit.AfterClass;
@@ -31,7 +32,8 @@ public class OrFilesTest {
         putFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
         putFile.setMongo(hosts);
         putFile.setD(db);// database
-        putFile.getDatabase().dropDatabase();
+        putFile.getDatabase().getCollection(bucket + ".chunks").drop();
+        putFile.getDatabase().getCollection(bucket + ".files").drop();
     }
 
     @AfterClass
@@ -50,7 +52,7 @@ public class OrFilesTest {
         Assert.assertFalse("Unit test should really not contain a stagingfile until the action is called to download it from the database.", downLoadFile.exists());
 
         final String md5 = Checksum.getMD5(f, false);
-        add(md5, bucket, url, null, null);
+        add(md5, bucket, url, null, null, true);
 
         OrGet getFile = new OrGet();
         getFile.setMongo(hosts);
@@ -66,11 +68,13 @@ public class OrFilesTest {
         downLoadFile.delete();
     }
 
-    private void add(String pid, String bucket, URL url, String md5, String shardKey) throws OrFilesException {
+    private void add(String pid, String bucket, URL url, String md5, String shardKey, Boolean add_files) throws OrFilesException {
 
         if (url == null) url = getClass().getResource(file);
         if (shardKey == null) shardKey = Integer.toString(new Random().nextInt());
         final OrPut putFile = new OrPut();
+
+
         putFile.setMongo(hosts);
         putFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
         putFile.setD(db);// database
@@ -80,6 +84,12 @@ public class OrFilesTest {
         putFile.setA(pid);
         putFile.setS(shardKey);
         putFile.setEnvironment("test");
+
+        if (add_files) {
+            final double _id = Double.parseDouble(shardKey);
+            putFile.getGridFS().getDB().getCollection(bucket + ".files").save(BasicDBObjectBuilder.start("_id", _id).append("reserved", true).get());
+        }
+
         putFile.action();
     }
 
@@ -89,14 +99,16 @@ public class OrFilesTest {
         final File f = new File(url.getFile());
 
         final String pid = Checksum.getMD5(f, false);
-        add(pid, bucket, url, null, null);
+        add(pid, bucket, url, null, null, true);
 
         final String md5Liar = "000000000000FF";
         try {
-            add(pid, bucket, url, md5Liar, null);
+            add(pid, bucket, url, md5Liar, null, true);
         } catch (OrFilesException e) {
             Assert.assertTrue("Test threw the wrong exception: " + e.getMessage() + ". Should be complaining about the md5 mismatch.", e.getMessage().contains(md5Liar));
         }
+
+
     }
 
     @Test
@@ -107,8 +119,8 @@ public class OrFilesTest {
         final File f = new File(url.getFile());
         final String pid = Checksum.getMD5(f, false);
 
-        add(pid, bucket, url, null, null);
-        add(pid, bucket, urlUpdate, null, null);
+        add(pid, bucket, url, null, null, true);
+        add(pid, bucket, urlUpdate, null, null, true);
 
         final OrPut putFile = new OrPut();
         putFile.setMongo(hosts);
@@ -132,7 +144,7 @@ public class OrFilesTest {
         final String shardKey = "9007199254740992"; // maximum floating number 2^53
         final double _shardKey = Double.parseDouble(shardKey);
 
-        add(pid1, bucket, url, null, shardKey);
+        add(pid1, bucket, url, null, shardKey, true);
         final OrPut putFile = new OrPut();
         putFile.setMongo(hosts);
         putFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
@@ -143,7 +155,7 @@ public class OrFilesTest {
 
         boolean failure = false;
         try {
-            add(pid2, bucket, urlUpdate, null, shardKey);
+            add(pid2, bucket, urlUpdate, null, shardKey, false);
         } catch (OrFilesException e) {
             failure = true;
         }
@@ -151,7 +163,7 @@ public class OrFilesTest {
 
         failure = false;
         try {
-            add(pid2, bucket, urlUpdate, null, "0");
+            add(pid2, bucket, urlUpdate, null, "0", true);
         } catch (OrFilesException e) {
             failure = true;
         }
@@ -159,7 +171,7 @@ public class OrFilesTest {
 
         failure = false;
         try {
-            add(pid2, bucket, urlUpdate, null, "-0");
+            add(pid2, bucket, urlUpdate, null, "-0", true);
         } catch (OrFilesException e) {
             failure = true;
         }
@@ -180,10 +192,10 @@ public class OrFilesTest {
         putFile.setD(db);// database
         putFile.setB(bucket);
 
-        add(pid, bucket, url, null, null);
+        add(pid, bucket, url, null, null, true);
         for (int i = 0; i < 10; i++) {
             final String p = pid + "." + i;
-            add(p, bucket, urlUpdate, null, null);
+            add(p, bucket, urlUpdate, null, null, true);
         }
 
         for (int i = 0; i < 10; i++) {
@@ -214,5 +226,7 @@ public class OrFilesTest {
             mustHaveError = true;
         }
         Assert.assertTrue("An invalid writeconcern setting should throw an exception.", mustHaveError);
+
+        //System.setProperty("WriteConcern", "FSYNC_SAFE");
     }
 }
