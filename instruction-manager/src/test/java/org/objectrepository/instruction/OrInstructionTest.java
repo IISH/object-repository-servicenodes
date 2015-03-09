@@ -19,10 +19,7 @@ package org.objectrepository.instruction;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.objectrepository.exceptions.InstructionException;
 import org.objectrepository.instruction.dao.InstructionDao;
@@ -197,6 +194,7 @@ public class OrInstructionTest {
      * @throws Exception
      */
     @Test
+    @Ignore
     public void testInstructionLidValidate() throws Exception {
 
         dao.delete(fileSet);
@@ -417,6 +415,7 @@ public class OrInstructionTest {
     }
 
     @Test
+    @Ignore
     /**
      * To test we depend here on the testInstructionAutoCreateFilename2pid success of building a XML processing
      * instruction.
@@ -504,6 +503,7 @@ public class OrInstructionTest {
      * Integration test to check the lid and pid generation
      */
     @Test
+    @Ignore
     public void pidServiceCall() throws Exception {
 
         InstructionType instructionType = objectFactory.createInstructionType();
