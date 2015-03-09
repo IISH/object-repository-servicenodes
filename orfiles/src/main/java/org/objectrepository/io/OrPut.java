@@ -81,7 +81,7 @@ public class OrPut extends OrFilesFactory {
         final Double _id = getS();
         if (_id == 0) throw new OrFilesException("Shardkey cannot be absent or zero.");
 
-        final DBObject findReservation = QueryBuilder.start("_id").is(_id).and("reserved").is(true).get();
+        final DBObject findReservation = QueryBuilder.start("_id").is(_id).and("metadata").is(QueryBuilder.start("pid").is(_id).get()).get();
         final DBObject reserved = getGridFS().findOne(findReservation);
         if (reserved == null)
             throw new OrFilesException("The shardkey is not reserved. It must be done so by the shardkey.js provider.");

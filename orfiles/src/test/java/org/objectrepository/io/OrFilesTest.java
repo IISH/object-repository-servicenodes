@@ -87,7 +87,9 @@ public class OrFilesTest {
 
         if (add_files) {
             final double _id = Double.parseDouble(shardKey);
-            putFile.getGridFS().getDB().getCollection(bucket + ".files").save(BasicDBObjectBuilder.start("_id", _id).append("reserved", true).get());
+            putFile.getGridFS().getDB().getCollection(bucket + ".files").save(BasicDBObjectBuilder.start("_id", _id)
+                    .append("metadata", BasicDBObjectBuilder.start("pid", _id).get())
+                    .get());
         }
 
         putFile.action();
@@ -227,6 +229,6 @@ public class OrFilesTest {
         }
         Assert.assertTrue("An invalid writeconcern setting should throw an exception.", mustHaveError);
 
-        //System.setProperty("WriteConcern", "FSYNC_SAFE");
+        System.setProperty("WriteConcern", "FSYNC_SAFE");
     }
 }
