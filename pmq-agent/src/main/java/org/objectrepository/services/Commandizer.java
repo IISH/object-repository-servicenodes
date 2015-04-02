@@ -27,6 +27,9 @@ import java.util.List;
  * <p/>
  * The result is a shell command like:
  * /path/to/the/bash -l -c '/path/to/the/shell/script -key1 "value1" -key2 "value 2" -key3 "This key\'s \"escaped\" value"'
+ * <p/>
+ * A single quote may not occur between single quotes, even when preceded by a backslash.
+ * Here we substitute the single quote with a double escaped quote.
  *
  * @author Jozsef Gabor Bone <bonej@ceu.hu>
  * @author Lucien van Wouw <lwo@iisg.nl>
@@ -179,17 +182,22 @@ public class Commandizer {
         escapeChars.add('$');
         escapeChars.add('\\');
         escapeChars.add('"');
-        escapeChars.add('\'');
+
+        final List<Character> substituteWithQuote = new ArrayList<Character>(1);
+        substituteWithQuote.add('\'');
 
         final StringBuilder sb = new StringBuilder(text.trim());
         for (int i = sb.length() - 1; i != -1; i--) {
             char c = sb.charAt(i);
             if (escapeChars.contains(c)) {
                 sb.insert(i, "\\");
+            } else if (substituteWithQuote.contains(c)) {
+                sb.deleteCharAt(i) ;
+                sb.insert(i, "\\\"");
             }
         }
 
-        if ( sb.indexOf(" ") != -1) {
+        if (sb.indexOf(" ") != -1) {
             sb.insert(0, "\"");
             sb.append("\"");
         }

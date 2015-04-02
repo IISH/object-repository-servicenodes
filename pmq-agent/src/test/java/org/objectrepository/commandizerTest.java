@@ -64,7 +64,7 @@ public class commandizerTest {
         Assert.assertTrue(arguments.contains("30"));
         Assert.assertTrue(arguments.contains("-dummy3"));
         Assert.assertTrue(arguments.contains("-label"));
-        Assert.assertTrue(arguments.contains("\"abc \\\"def\\\" ghi \\'jkl\\' opq v\\$w\""));
+        Assert.assertTrue(arguments.contains("\"abc \\\"def\\\" ghi \\\"jkl\\\" opq v\\$w\""));
         Assert.assertFalse(arguments.contains("open"));
         Assert.assertFalse(arguments.contains(""));
         Assert.assertFalse(arguments.contains(null));
