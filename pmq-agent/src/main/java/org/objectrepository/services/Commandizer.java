@@ -23,16 +23,24 @@ import java.util.List;
  * Commandizer
  * <p/>
  * Parses an Instruction type into "flat" command line parameters:
- * key value
+ * key value.
+ * <p/>
+ * The result is a shell command like:
+ * /path/to/the/bash -l -c '/path/to/the/shell/script -key1 "value1" -key2 "value 2" -key3 "This key\'s \"escaped\" value"'
  *
- * @author: Jozsef Gabor Bone <bonej@ceu.hu>
+ * @author Jozsef Gabor Bone <bonej@ceu.hu>
+ * @author Lucien van Wouw <lwo@iisg.nl>
  */
 
 public class Commandizer {
 
-    public static CommandLine makeCommand(String commandToRun, String message) {
+    public static CommandLine makeCommand(String bash, String commandToRun, String message) {
 
-        final CommandLine command = new CommandLine(commandToRun);
+        final CommandLine command = new CommandLine(bash);
+        command.addArgument("-l", false);
+        command.addArgument("-c", false);
+        command.addArgument("'" + commandToRun, false);
+
         final Document dom = parseXml(makeInputStream(message));
         parseDocument(command, dom);
         if (log.isDebugEnabled()) {
@@ -42,6 +50,9 @@ public class Commandizer {
                 log.debug(argument);
             }
         }
+
+        command.addArgument("'", false);
+
         return command;
     }
 
@@ -100,7 +111,7 @@ public class Commandizer {
             final String key = "-" + name;
             if (value != null && !keys.contains(key)) {
                 keys.add(key);
-                command.addArgument(key);
+                command.addArgument(key, false);
                 command.addArgument(value, false);
                 log.debug("Added to command " + key + " = " + value);
             }
@@ -154,9 +165,10 @@ public class Commandizer {
      * escaping
      * <p/>
      * Escapes key tokens of Linux ( we will target this OS )
+     * Add double quotes
      *
-     * @param text
-     * @return
+     * @param text String to normalize
+     * @return The normalized string
      */
     private static String escaping(String text) {
 
@@ -166,6 +178,8 @@ public class Commandizer {
         final List<Character> escapeChars = new ArrayList<Character>(2);
         escapeChars.add('$');
         escapeChars.add('\\');
+        escapeChars.add('"');
+        escapeChars.add('\'');
 
         final StringBuilder sb = new StringBuilder(text.trim());
         for (int i = sb.length() - 1; i != -1; i--) {
@@ -174,6 +188,12 @@ public class Commandizer {
                 sb.insert(i, "\\");
             }
         }
+
+        if ( sb.indexOf(" ") != -1) {
+            sb.insert(0, "\"");
+            sb.append("\"");
+        }
+
         return sb.toString();
     }
 

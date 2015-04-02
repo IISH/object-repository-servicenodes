@@ -38,6 +38,7 @@ public class commandizerTest {
                 "        <location>File on the $staging \\ area...</location>\n" +
                 "        <md5>dc2227bf78e0ee19f8929530cdedc5e7</md5>\n" +
                 "        <access>closed</access>\n" +
+                "        <label>abc \"def\" ghi 'jkl' opq v$w</label>\n" +
                 "        <dummy1></dummy1>\n" +
                 "        <dummy2/>\n" +
                 "    </stagingfile>\n" +
@@ -47,11 +48,11 @@ public class commandizerTest {
                 "    </task></workflow>\n" +
                 "</instruction>";
 
-        CommandLine cmd = Commandizer.makeCommand("/opt/bash.sh", message);
+        CommandLine cmd = Commandizer.makeCommand("/bin/bash", "/opt/bash.sh", message);
         System.out.println("And the command is:");
         System.out.println(cmd);
         List<String> arguments = Arrays.asList(cmd.getArguments());
-        Assert.assertEquals(28, arguments.size());
+        Assert.assertEquals(32, arguments.size());
         Assert.assertTrue(arguments.contains("-name"));
         Assert.assertTrue(arguments.contains("InstructionAutoCreate"));
         Assert.assertTrue(arguments.contains("-md5"));
@@ -62,6 +63,8 @@ public class commandizerTest {
         Assert.assertTrue(arguments.contains("closed"));
         Assert.assertTrue(arguments.contains("30"));
         Assert.assertTrue(arguments.contains("-dummy3"));
+        Assert.assertTrue(arguments.contains("-label"));
+        Assert.assertTrue(arguments.contains("\"abc \\\"def\\\" ghi \\'jkl\\' opq v\\$w\""));
         Assert.assertFalse(arguments.contains("open"));
         Assert.assertFalse(arguments.contains(""));
         Assert.assertFalse(arguments.contains(null));
@@ -82,7 +85,7 @@ public class commandizerTest {
                 "</stagingfile>\n" +
                 "</junk>";
 
-        CommandLine cmd = Commandizer.makeCommand("/opt/bash.sh", message);
+        CommandLine cmd = Commandizer.makeCommand("/bin/bash", "/opt/bash.sh", message);
         System.out.println("And the command is:");
         System.out.println(cmd);
         Assert.assertNotNull(cmd);

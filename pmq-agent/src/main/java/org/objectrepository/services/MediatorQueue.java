@@ -35,16 +35,17 @@ public class MediatorQueue implements Runnable {
     private ConsumerTemplate consumer;
     private String messageQueue;
     private String shellScript;
-    private long timerDelay = 10;
+    private String bash;
     private long heartbeatInterval;
     private ProducerTemplate producer;
 
-    public MediatorQueue(MongoTemplate mongoTemplate, ConsumerTemplate consumer, ProducerTemplate producer, String messageQueue, String shellScript, long heartbeatInterval) {
+    public MediatorQueue(MongoTemplate mongoTemplate, ConsumerTemplate consumer, ProducerTemplate producer, String messageQueue, String bash, String shellScript, long heartbeatInterval) {
         this.mongoTemplate = mongoTemplate;
         this.consumer = consumer;
         this.producer = producer;
         this.messageQueue = messageQueue;
         this.shellScript = shellScript;
+        this.bash = bash;
         this.heartbeatInterval = heartbeatInterval;
     }
 
@@ -104,7 +105,8 @@ public class MediatorQueue implements Runnable {
 
         final long start = new Date().getTime();
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new HeartBeat(mongoTemplate, messageQueue, StatusCodeTaskReceipt, identifier, start), timerDelay, heartbeatInterval);
+        long TIMER_DELAY = 10;
+        timer.scheduleAtFixedRate(new HeartBeat(mongoTemplate, messageQueue, StatusCodeTaskReceipt, identifier, start), TIMER_DELAY, heartbeatInterval);
 
 
         DefaultExecutor executor = new DefaultExecutor();
@@ -116,7 +118,7 @@ public class MediatorQueue implements Runnable {
         executor.setProcessDestroyer(new ShutdownHookProcessDestroyer());
 
         //Executing the command
-        final CommandLine commandLine = Commandizer.makeCommand(shellScript, message);
+        final CommandLine commandLine = Commandizer.makeCommand(bash, shellScript, message);
         DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
         log.debug("Executing command: " + commandLine.toString());
         try {

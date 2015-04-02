@@ -95,7 +95,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             return new MediatorTopic(this, context.getBean(ConsumerTemplate.class), "activemq:topic:" + queue.getQueueName());
         } else {
             log.info("Adding queue consumer for " + queue.getQueueName());
-            return new MediatorQueue(context.getBean(MongoTemplate.class), context.getBean(ConsumerTemplate.class), context.getBean(ProducerTemplate.class), "activemq:" + queue.getQueueName(), queue.getShellScript(), heartbeatInterval);
+            return new MediatorQueue(context.getBean(MongoTemplate.class), context.getBean(ConsumerTemplate.class), context.getBean(ProducerTemplate.class), "activemq:" + queue.getQueueName(), queue.getBash(), queue.getShellScript(), heartbeatInterval);
         }
     }
 
@@ -167,7 +167,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
      * That folder ought to contain one or more folders ( or symbolic links ) to the files
      * The folder has the format: [foldername] or [foldername].[maxTasks]
      * MaxTasks is to indicate the total number of jobs being able to run.
-     *
+     * <p/>
      * long
      *
      * @param argv
@@ -215,6 +215,16 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 System.exit(-1);
             }
 
+            if (!properties.containsKey("-bash")) {
+                log.fatal("Expected bash executable: -bash");
+                System.exit(-1);
+            }
+            final File bash = new File((String) properties.get("-bash"));
+            if (!bash.exists()) {
+                log.fatal("Bash does not exist here: " + bash.getAbsolutePath());
+                System.exit(-1);
+            }
+
             long heartbeatInterval = 600000;
             if (properties.containsKey("-heartbeatInterval")) {
                 heartbeatInterval = Long.parseLong((String) properties.get("heartbeatInterval"));
@@ -227,6 +237,8 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 identifier = (String) properties.get("-identifier");
             }
 
+            final String CYGWIN_HOME = System.getenv("CYGWIN_HOME");
+
             final File[] files = messageQueues.listFiles();
             final String[] scriptNames = (properties.containsKey("-startup"))
                     ? new String[]{properties.getProperty("-startup")}
@@ -237,11 +249,13 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 final String[] split = name.split("\\.", 2);
                 final String queueName = split[0];
                 for (String scriptName : scriptNames) {
-                    final String shellScript = file.getAbsolutePath() + scriptName;
+                    final String shellScript = (CYGWIN_HOME == null)
+                            ? file.getAbsolutePath() + scriptName
+                            : file.getAbsolutePath().substring(CYGWIN_HOME.length()).replace("\\", "/") + scriptName;
                     final int maxTask = (split.length == 1) ? 1 : Integer.parseInt(split[1]);
                     log.info("Candidate mq client for " + queueName + " maxTasks " + maxTask);
                     if (new File(shellScript).exists()) {
-                        final Queue queue = new Queue(queueName, shellScript, false);
+                        final Queue queue = new Queue(queueName, bash.getAbsolutePath(), shellScript, false);
                         queue.setCorePoolSize(1);
                         queue.setMaxPoolSize(maxTask);
                         queue.setQueueCapacity(1);
@@ -259,7 +273,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             }
 
             // Add the system queue
-            queues.add(new Queue("Connection", null, true));
+            queues.add(new Queue("Connection", null, null, true));
 
             getInstance(queues, identifier, heartbeatInterval).run();
         }
