@@ -249,12 +249,13 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 final String[] split = name.split("\\.", 2);
                 final String queueName = split[0];
                 for (String scriptName : scriptNames) {
+                    final String _shellScript = file.getAbsolutePath() + scriptName;
                     final String shellScript = (CYGWIN_HOME == null)
-                            ? file.getAbsolutePath() + scriptName
-                            : file.getAbsolutePath().substring(CYGWIN_HOME.length()).replace("\\", "/") + scriptName;
+                            ? _shellScript
+                            : _shellScript.substring(CYGWIN_HOME.length()).replace("\\", "/");
                     final int maxTask = (split.length == 1) ? 1 : Integer.parseInt(split[1]);
                     log.info("Candidate mq client for " + queueName + " maxTasks " + maxTask);
-                    if (new File(shellScript).exists()) {
+                    if (new File(_shellScript).exists()) {
                         final Queue queue = new Queue(queueName, bash.getAbsolutePath(), shellScript, false);
                         queue.setCorePoolSize(1);
                         queue.setMaxPoolSize(maxTask);
