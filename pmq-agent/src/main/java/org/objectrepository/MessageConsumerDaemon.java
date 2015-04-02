@@ -169,8 +169,6 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
      * MaxTasks is to indicate the total number of jobs being able to run.
      * <p/>
      * long
-     *
-     * @param argv
      */
     public static void main(String[] argv) {
 
@@ -215,13 +213,9 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 System.exit(-1);
             }
 
-            if (!properties.containsKey("-bash")) {
-                log.fatal("Expected bash executable: -bash");
-                System.exit(-1);
-            }
-            final File bash = new File((String) properties.get("-bash"));
-            if (!bash.exists()) {
-                log.fatal("Bash does not exist here: " + bash.getAbsolutePath());
+            final String bash = System.getProperty("-bash");
+            if (bash != null && !new File(bash).exists()) {
+                log.fatal("Bash not found: " + bash);
                 System.exit(-1);
             }
 
@@ -238,7 +232,6 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             }
 
             final String CYGWIN_HOME = System.getenv("CYGWIN_HOME");
-
             final File[] files = messageQueues.listFiles();
             final String[] scriptNames = (properties.containsKey("-startup"))
                     ? new String[]{properties.getProperty("-startup")}
@@ -256,7 +249,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                     final int maxTask = (split.length == 1) ? 1 : Integer.parseInt(split[1]);
                     log.info("Candidate mq client for " + queueName + " maxTasks " + maxTask);
                     if (new File(_shellScript).exists()) {
-                        final Queue queue = new Queue(queueName, bash.getAbsolutePath(), shellScript, false);
+                        final Queue queue = new Queue(queueName, bash, shellScript, false);
                         queue.setCorePoolSize(1);
                         queue.setMaxPoolSize(maxTask);
                         queue.setQueueCapacity(1);
@@ -278,6 +271,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
 
             getInstance(queues, identifier, heartbeatInterval).run();
         }
+
         System.exit(0);
     }
 

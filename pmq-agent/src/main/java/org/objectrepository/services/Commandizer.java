@@ -39,10 +39,16 @@ public class Commandizer {
 
     public static CommandLine makeCommand(String bash, String commandToRun, String message) {
 
-        final CommandLine command = new CommandLine(bash);
-        command.addArgument("-l", false);
-        command.addArgument("-c", false);
-        command.addArgument("'" + commandToRun, false);
+        final boolean use_native_shell = (bash == null);
+        final CommandLine command = (use_native_shell)
+                ? new CommandLine(commandToRun)
+                : new CommandLine(bash);
+
+        if (!use_native_shell) {
+            command.addArgument("-l", false);
+            command.addArgument("-c", false);
+            command.addArgument("'" + commandToRun, false);
+        }
 
         final Document dom = parseXml(makeInputStream(message));
         parseDocument(command, dom);
@@ -54,7 +60,8 @@ public class Commandizer {
             }
         }
 
-        command.addArgument("'", false);
+        if (!use_native_shell)
+            command.addArgument("'", false);
 
         return command;
     }
@@ -192,7 +199,7 @@ public class Commandizer {
             if (escapeChars.contains(c)) {
                 sb.insert(i, "\\");
             } else if (substituteWithQuote.contains(c)) {
-                sb.deleteCharAt(i) ;
+                sb.deleteCharAt(i);
                 sb.insert(i, "\\\"");
             }
         }
