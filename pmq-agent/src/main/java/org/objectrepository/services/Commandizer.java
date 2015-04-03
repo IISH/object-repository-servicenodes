@@ -175,7 +175,6 @@ public class Commandizer {
      * escaping
      * <p/>
      * Escapes key tokens of Linux ( we will target this OS )
-     * Add double quotes
      *
      * @param text String to normalize
      * @return The normalized string
@@ -202,11 +201,6 @@ public class Commandizer {
                 sb.deleteCharAt(i);
                 sb.insert(i, "\\\"");
             }
-        }
-
-        if (sb.indexOf(" ") != -1) {
-            sb.insert(0, "\"");
-            sb.append("\"");
         }
 
         return sb.toString();
