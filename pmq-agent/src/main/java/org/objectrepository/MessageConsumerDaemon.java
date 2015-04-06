@@ -130,7 +130,6 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
      * <p/>
      * Sets the queues.
      *
-     * @param taskExecutors
      */
     public void setTaskExecutors(List<Queue> taskExecutors) {
         this.taskExecutors = taskExecutors;
@@ -213,7 +212,7 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
                 System.exit(-1);
             }
 
-            final String bash = System.getProperty("-bash");
+            final String bash = (String) properties.get("-bash");
             if (bash != null && !new File(bash).exists()) {
                 log.fatal("Bash not found: " + bash);
                 System.exit(-1);
@@ -232,11 +231,11 @@ public class MessageConsumerDaemon extends Thread implements Runnable {
             }
 
             final String CYGWIN_HOME = System.getenv("CYGWIN_HOME");
-            final File[] files = messageQueues.listFiles();
             final String[] scriptNames = (properties.containsKey("-startup"))
                     ? new String[]{properties.getProperty("-startup")}
                     : new String[]{"/startup.sh", "\\startup.bat"};
             final List<Queue> queues = new ArrayList<Queue>();
+            final File[] files = messageQueues.listFiles();
             for (File file : files) {
                 final String name = file.getName();
                 final String[] split = name.split("\\.", 2);
