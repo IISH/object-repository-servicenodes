@@ -50,6 +50,8 @@ public final class InstructionValidateService extends ServiceBaseImp {
     @Autowired
     private InstructionAutocreateService autocreateService;
 
+    private boolean disallowZeroLengthFiles = true;
+
     @Override
     public void build(OrIterator instruction) {
         super.build(instruction);
@@ -62,7 +64,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
      *
      * @param instruction to be searched
      */
-    public void findMissingFiles(OrIterator instruction) {
+    private void findMissingFiles(OrIterator instruction) {
 
         while (instruction.hasNext()) {
             StagingfileType stagingfileType = instruction.next();
@@ -84,7 +86,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
      * @param stagingfileType
      * @return
      */
-    public boolean missing(InstructionType instruction, StagingfileType stagingfileType) {
+    private boolean missing(InstructionType instruction, StagingfileType stagingfileType) {
 
         final boolean checkMaster = Normalizers.isEmpty(instruction.getPlan()) || instruction.getPlan().contains("StagingfileIngestMaster");
         final String action = (String) InstructionTypeHelper.getValue(instruction, stagingfileType, "action");
@@ -138,7 +140,10 @@ public final class InstructionValidateService extends ServiceBaseImp {
     @Override
     public void objectFromFile(File file, OrIterator instruction) {
 
-        final boolean checkMaster = Normalizers.isEmpty(instruction.getInstruction().getPlan()) || instruction.getInstruction().getPlan().contains("StagingfileIngestMaster");
+        final String plan = instruction.getInstruction().getPlan();
+        boolean empty = Normalizers.isEmpty(plan);
+        disallowZeroLengthFiles = empty || !plan.contains("PackageInstruction");
+        final boolean checkMaster = empty || plan.contains("StagingfileIngestMaster");
         StagingfileType stagingfileType = instruction.getFileByLocation(Normalizers.toRelative(instruction.getInstruction().getFileSet(), file));
         if (checkMaster && wrongFileContent(file, instruction, stagingfileType)) {
             instruction.add(stagingfileType);
@@ -235,7 +240,7 @@ public final class InstructionValidateService extends ServiceBaseImp {
         if (file == null || !file.canRead() || file.isDirectory())
             throw new InstructionException("CantReadFile");
 
-        if (file.length() == 0)
+        if (disallowZeroLengthFiles && file.length() == 0)
             throw new InstructionException("FileZeroSize");
 
         final String md5_from_instruction = stagingfileType.getMd5();
