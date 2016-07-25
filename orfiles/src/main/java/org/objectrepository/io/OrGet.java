@@ -2,6 +2,7 @@ package org.objectrepository.io;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 import com.mongodb.gridfs.GridFSDBFile;
 import org.apache.log4j.Logger;
 import org.objectrepository.exceptions.OrFilesException;
@@ -19,7 +20,7 @@ public class OrGet extends OrFilesFactory {
     public void action() throws OrFilesException {
 
         assert getL() != null;
-        final DBObject query = new BasicDBObject("metadata.pid", getA());
+        final DBObject query =  (getS() == 0) ? new BasicDBObject("metadata.pid", getA()) : new BasicDBObject("_id", getS());
         final GridFSDBFile gridFSDBFile = getGridFS().findOne(query);
         if (gridFSDBFile == null) {
             log.warn("No such file in database: " + query.toString());

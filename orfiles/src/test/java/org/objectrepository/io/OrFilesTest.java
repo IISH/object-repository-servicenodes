@@ -43,7 +43,7 @@ public class OrFilesTest {
     }
 
     @Test
-    public void get() throws OrFilesException {
+    public void getByPid() throws OrFilesException {
 
         final URL url = getClass().getResource(file);
         final File f = new File(url.getFile());
@@ -61,6 +61,34 @@ public class OrFilesTest {
         getFile.setM(md5);
         getFile.setB(bucket);
         getFile.setA(md5);
+        getFile.setL(downLoadFile.getAbsolutePath());
+
+        getFile.action();
+        Assert.assertTrue("Failed to download the stagingfile...", downLoadFile.exists());
+        downLoadFile.delete();
+    }
+
+    @Test
+    public void getByShardkey() throws OrFilesException {
+
+        final URL url = getClass().getResource(file);
+        final File f = new File(url.getFile());
+        final File downLoadFile = new File(f.getParent(), "test.stagingfile.shardkey");
+        downLoadFile.delete();
+        Assert.assertFalse("Unit test should really not contain a stagingfile until the action is called to download it from the database.", downLoadFile.exists());
+
+        final String md5 = Checksum.getMD5(f, false);
+        final String shardKey = Integer.toString(new Random().nextInt());
+        add(md5, bucket, url, null, shardKey, true);
+
+        OrGet getFile = new OrGet();
+        getFile.setMongo(hosts);
+        getFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
+        getFile.setD(db);// database
+        getFile.setM(md5);
+        getFile.setB(bucket);
+        getFile.setA("rubish");
+        getFile.setS(shardKey);
         getFile.setL(downLoadFile.getAbsolutePath());
 
         getFile.action();
