@@ -43,6 +43,7 @@ public abstract class OrFilesFactory implements OrFiles {
     private String q;
     private String t;
     private String a;
+    private String r;
     private String shardKey;
 
     public Mongo getMongo() {
@@ -207,6 +208,14 @@ public abstract class OrFilesFactory implements OrFiles {
         this.q = q;
     }
 
+    public String getR() {
+        return r;
+    }
+
+    public void setR(String r) {
+        this.r = r;
+    }
+
     /**
      * Returns the md5 from the supplied metadata
      * If not available, calculated the md5
@@ -246,4 +255,6 @@ public abstract class OrFilesFactory implements OrFiles {
     }
 
     private static Logger log = Logger.getLogger(OrFilesFactory.class);
+
+
 }

@@ -43,6 +43,33 @@ public class OrFilesTest {
     }
 
     @Test
+    public void getReplica() throws OrFilesException {
+
+        final URL url = getClass().getResource(file);
+        final File f = new File(url.getFile());
+        final File downLoadFile = new File(f.getParent(), "test.replicafile");
+        downLoadFile.delete();
+        Assert.assertFalse("Unit test should really not contain a stagingfile until the action is called to download it from the database.", downLoadFile.exists());
+
+        final String md5 = Checksum.getMD5(f, false);
+        add(md5, bucket, url, null, null, true);
+
+        OrReplica getFile = new OrReplica();
+        getFile.setMongo(hosts);
+        getFile.setR(hosts[0]);
+        getFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
+        getFile.setD(db);// database
+        getFile.setM(md5);
+        getFile.setB(bucket);
+        getFile.setA(md5);
+        getFile.setL(downLoadFile.getAbsolutePath());
+
+        getFile.action();
+        Assert.assertTrue("Failed to download the stagingfile...", downLoadFile.exists());
+        downLoadFile.delete();
+    }
+
+    @Test
     public void getByPid() throws OrFilesException {
 
         final URL url = getClass().getResource(file);

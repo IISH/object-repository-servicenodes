@@ -47,6 +47,7 @@ public final class Console {
         defaults.put("-a", null);// the alias
         defaults.put("-s", "0");// the shardKey prefix
         defaults.put("-t", "application/octet-stream");// the contentType
+        defaults.put("-r", ""); // alternative replica set
         defaults.put("-M", "Get"); // method
         return defaults;
     }
