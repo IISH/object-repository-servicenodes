@@ -34,6 +34,7 @@ public class OrReplica extends OrFilesFactory {
         }
 
         final OrReplica replica = new OrReplica();
+        replica.setD(getD());
         replica.setB(getB());
         final String[] hosts = getR().split("\\s|,|;|\t");
         replica.setMongo(hosts);
