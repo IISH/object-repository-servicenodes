@@ -27,7 +27,7 @@ public class OrReplica extends OrFilesFactory {
         DBCollection collection = getMongo().getDB(getD()).getCollection(getB() + ".files");
         collection.setObjectClass(ReplicaGridFSDBFile.class);
         final DBObject metadata = collection.findOne(query);
-        this.getMongo().close();
+        close();
         if (metadata == null) {
             log.warn("No such file in database: " + query.toString());
             return;

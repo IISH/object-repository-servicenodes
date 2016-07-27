@@ -55,7 +55,6 @@ public class OrFilesTest {
         add(md5, bucket, url, null, null, true);
 
         OrReplica getFile = new OrReplica();
-        getFile.setMongo(hosts);
         getFile.setR(hosts[0]);
         getFile.setH("localhost");// hosts, like localhost:27027,localhost:27028
         getFile.setD(db);// database
@@ -63,6 +62,7 @@ public class OrFilesTest {
         getFile.setB(bucket);
         getFile.setA(md5);
         getFile.setL(downLoadFile.getAbsolutePath());
+        getFile.setMongo(hosts);
 
         getFile.action();
         Assert.assertTrue("Failed to download the stagingfile...", downLoadFile.exists());

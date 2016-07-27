@@ -241,7 +241,10 @@ public abstract class OrFilesFactory implements OrFiles {
      * Closes the database connection
      */
     public void close() {
-        getGridFS().getDB().getMongo().close();
+        if (mongo != null) {
+            mongo.close();
+            mongo = null;
+        }
     }
 
     public static OrFiles newInstance(String method) throws OrFilesException {
